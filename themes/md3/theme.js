@@ -108,3 +108,111 @@
         if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; }
     }, { passive: true });
 })();
+
+/**
+ * MD3 增强 II：
+ * 1) range active 轨分色（--md3-range-val 百分比注入）
+ * 2) MD3 tooltip（替代原生 title 白框：plain tooltip 4px 圆角、inverse-surface 底）
+ */
+(() => {
+    if (window.__md3Enhance) return;
+    window.__md3Enhance = true;
+
+    const isMd3 = () => document.documentElement.getAttribute('data-theme') === 'md3';
+    const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---- range 分色 ---- */
+    function paintRange(input) {
+        const min = Number(input.min) || 0;
+        const max = Number(input.max) || 100;
+        const val = Number(input.value) || 0;
+        const pct = max > min ? ((val - min) / (max - min)) * 100 : 0;
+        input.style.setProperty('--md3-range-val', pct + '%');
+    }
+
+    function initRanges() {
+        if (!isMd3()) return;
+        document.querySelectorAll('.ena-range').forEach((el) => {
+            paintRange(el);
+            if (!el.__md3RangeBound) {
+                el.__md3RangeBound = true;
+                el.addEventListener('input', () => paintRange(el));
+            }
+        });
+    }
+
+    /* ---- MD3 tooltip ---- */
+    let tipEl = null;
+    let tipTimer = null;
+
+    function getTip() {
+        if (!tipEl) {
+            tipEl = document.createElement('div');
+            tipEl.className = 'md3-tooltip';
+            tipEl.setAttribute('role', 'tooltip');
+            document.body.appendChild(tipEl);
+        }
+        return tipEl;
+    }
+
+    function showTip(target) {
+        const label = target.getAttribute('data-md3-tip') || target.getAttribute('title');
+        if (!label) return;
+        const tip = getTip();
+        tip.textContent = label;
+        tip.classList.add('is-visible');
+        const rect = target.getBoundingClientRect();
+        const tw = tip.offsetWidth;
+        const th = tip.offsetHeight;
+        let left = rect.left + rect.width / 2 - tw / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+        let top = rect.top - th - 6;
+        if (top < 8) top = rect.bottom + 6;
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+    }
+
+    function hideTip() {
+        if (tipEl) tipEl.classList.remove('is-visible');
+    }
+
+    const TIP_DELAY_MS = 350;
+    const TIP_SELECTOR = '.ena-btn[title], .player-play[title], .side-nav a[title], .song-row [title]';
+
+    document.addEventListener('pointerover', (ev) => {
+        if (!isMd3()) return;
+        if (ev.pointerType === 'touch') return;
+        const el = ev.target.closest && ev.target.closest(TIP_SELECTOR);
+        if (!el) return;
+        // 原生 title 抑制：转存后移除，浏览器不再弹原生白框
+        const title = el.getAttribute('title');
+        if (title) {
+            el.setAttribute('data-md3-tip', title);
+            el.removeAttribute('title');
+        }
+        if (reduced()) return;
+        clearTimeout(tipTimer);
+        tipTimer = setTimeout(() => showTip(el), TIP_DELAY_MS);
+    }, { passive: true });
+
+    document.addEventListener('pointerout', (ev) => {
+        if (!tipEl) return;
+        clearTimeout(tipTimer);
+        hideTip();
+    }, { passive: true });
+
+    document.addEventListener('pointerdown', hideTip, { passive: true });
+    window.addEventListener('blur', hideTip);
+    window.addEventListener('scroll', hideTip, { passive: true });
+
+    /* ---- 初始与视图变化时重刷 range ---- */
+    const init = () => initRanges();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    // 视图挂载后（innerHTML 重建）重扫
+    const mo = new MutationObserver(() => initRanges());
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+})();

@@ -2558,3 +2558,122 @@ html[data-theme="md3"]::view-transition-group(md3-content) {
         transition: none;
     }
 }
+
+
+/* ==================== v10：滑杆 MD3 化（active/inactive 分轨 + 紧凑 handle） ==================== */
+
+/* 轨道：4px；active 段 primary、inactive 段 surface 容器色（--md3-range-val 由 theme.js 注入） */
+:root[data-theme="md3"] .ena-range {
+    height: 20px;
+    background: transparent;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .ena-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: linear-gradient(
+        to right,
+        var(--md3-primary) 0%,
+        var(--md3-primary) var(--md3-range-val, 0%),
+        color-mix(in srgb, var(--md3-surface-container-highest) 100%, transparent) var(--md3-range-val, 0%),
+        color-mix(in srgb, var(--md3-surface-container-highest) 100%, transparent) 100%
+    );
+}
+
+/* handle：12px 紧凑圆 + 2px primary 环（MD3 slider 在小空间的比例） */
+:root[data-theme="md3"] .ena-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: var(--md3-primary);
+    border: 2px solid var(--md3-surface, #141218);
+    margin-top: -4px;
+    box-shadow: none;
+    transition: transform 150ms var(--ease-standard), background-color 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-range:hover::-webkit-slider-thumb {
+    transform: scale(1.15);
+}
+
+:root[data-theme="md3"] .ena-range:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+    background: color-mix(in srgb, var(--md3-primary) 88%, var(--md3-on-primary) 12%);
+}
+
+/* Firefox */
+:root[data-theme="md3"] .ena-range::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--md3-surface-container-highest) 100%, transparent);
+}
+
+:root[data-theme="md3"] .ena-range::-moz-range-progress {
+    height: 4px;
+    border-radius: 9999px;
+    background: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .ena-range::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: var(--md3-primary);
+    border: 2px solid var(--md3-surface, #141218);
+}
+
+/* 音量弹层滑杆：竖直布局同规则 */
+:root[data-theme="md3"] .volume-popup .ena-range {
+    height: 20px;
+}
+
+/* reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .ena-range::-webkit-slider-thumb,
+    :root[data-theme="md3"] .ena-range:active::-webkit-slider-thumb {
+        transition: none;
+        transform: none;
+    }
+}
+
+
+/* ==================== v10b：MD3 tooltip（plain tooltip 规范） ==================== */
+/* material-esm tooltip：inverse-surface 底、on-inverse-surface 字、4px 圆角、150ms 淡入 */
+.md3-tooltip {
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    background: var(--md3-inverse-surface, #322f35);
+    color: var(--md3-on-inverse-surface, #f5eff7);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1rem;
+    letter-spacing: 0.2px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: scale(0.9);
+    transform-origin: center bottom;
+    transition: opacity 150ms cubic-bezier(0.2, 0, 0, 1), transform 150ms cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .3);
+    white-space: nowrap;
+    max-width: 40ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.md3-tooltip.is-visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .md3-tooltip {
+        transition: none;
+        transform: none;
+    }
+}
