@@ -1938,3 +1938,231 @@ html[data-theme="md3"]::view-transition-group(md3-content) {
         opacity: 0;
     }
 }
+
+
+/* ==================== v7：material-esm 全组件对齐（loading/tabs/snackbar/focus/elevation） ==================== */
+
+/* ---- Elevation：material-esm internal/elevation/elevation.js 分级公式 ---- */
+:root[data-theme="md3"] {
+    --md3-shadow-1: 0 1px 2px 0 color-mix(in srgb, var(--md3-shadow, #000) 30%, transparent),
+        0 1px 3px 1px color-mix(in srgb, var(--md3-shadow, #000) 15%, transparent);
+    --md3-shadow-2: 0 1px 2px 0 color-mix(in srgb, var(--md3-shadow, #000) 30%, transparent),
+        0 2px 6px 2px color-mix(in srgb, var(--md3-shadow, #000) 15%, transparent);
+    --md3-shadow-3: 0 4px 8px 3px color-mix(in srgb, var(--md3-shadow, #000) 15%, transparent),
+        0 1px 3px 0 color-mix(in srgb, var(--md3-shadow, #000) 30%, transparent);
+    --md3-shadow-4: 0 6px 10px 4px color-mix(in srgb, var(--md3-shadow, #000) 15%, transparent),
+        0 2px 3px 0 color-mix(in srgb, var(--md3-shadow, #000) 30%, transparent);
+}
+
+/* ---- Loading：material-esm indicators/progress.js 圆形 spinner 四段弧 ---- */
+/* loading-bars（MSCD 三柱加载）→ MD3 圆形 spinner 视觉（保持 DOM，重绘为四段弧旋转） */
+@keyframes md3-linear-rotate {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes md3-rotate-arc {
+    12.5% { transform: rotate(135deg); }
+    25% { transform: rotate(270deg); }
+    37.5% { transform: rotate(405deg); }
+    50% { transform: rotate(540deg); }
+    62.5% { transform: rotate(675deg); }
+    75% { transform: rotate(810deg); }
+    87.5% { transform: rotate(945deg); }
+    100% { transform: rotate(1080deg); }
+}
+
+@keyframes md3-expand-arc {
+    0% { transform: rotate(265deg); }
+    50% { transform: rotate(130deg); }
+    100% { transform: rotate(265deg); }
+}
+
+:root[data-theme="md3"] .loading-bars,
+:root[data-theme="md3"] .side-tree-loading {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    position: relative;
+}
+
+/* 三柱 span 重绘为弧片段：容器旋转 5332ms，弧片段自身 1333ms 呼吸 */
+:root[data-theme="md3"] .loading-bars span,
+:root[data-theme="md3"] .side-tree-loading span {
+    position: absolute;
+    inset: 0;
+    width: auto;
+    height: auto;
+    margin: 0;
+    border-radius: 50%;
+    border: 3.5px solid transparent;
+    border-top-color: var(--md3-primary);
+    border-right-color: var(--md3-primary);
+    animation: md3-expand-arc 1333ms cubic-bezier(0.4, 0, 0.2, 1) infinite both;
+    opacity: 1;
+}
+
+/* 容器整体旋转（material-esm .spinner 规范） */
+:root[data-theme="md3"] .loading-bars,
+:root[data-theme="md3"] .side-tree-loading {
+    animation: md3-rotate-arc 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both;
+}
+
+/* 三柱相位 → 弧片段偏移（视觉近似四段弧的层次感） */
+:root[data-theme="md3"] .loading-bars span:nth-child(1),
+:root[data-theme="md3"] .side-tree-loading span:nth-child(1) {
+    animation-delay: -444ms;
+}
+
+:root[data-theme="md3"] .loading-bars span:nth-child(3),
+:root[data-theme="md3"] .side-tree-loading span:nth-child(3) {
+    animation-delay: -888ms;
+    border-top-color: color-mix(in srgb, var(--md3-primary) 60%, transparent);
+    border-right-color: color-mix(in srgb, var(--md3-primary) 60%, transparent);
+}
+
+/* loading-state 文案排版 */
+:root[data-theme="md3"] .loading-state p {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--md3-on-surface-variant);
+}
+
+/* ---- Tabs：material-esm tabs/tab.js 指示器 250ms EMPHASIZED 滑动 ---- */
+:root[data-theme="md3"] .search-tab::before {
+    transition: width 250ms var(--ease-emphasized),
+        transform 250ms var(--ease-emphasized),
+        left 250ms var(--ease-emphasized);
+}
+
+/* ---- Snackbar/Toast：material-esm snackbar.js 150ms emphasized-decelerate ---- */
+:root[data-theme="md3"] .ena-toast.is-in .ena-toast__body {
+    animation: md3-snackbar-in 150ms var(--ease-emphasized-decelerate) both;
+}
+
+@keyframes md3-snackbar-in {
+    from { opacity: 0; transform: translateY(100%); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Focus ring：material-esm internal/focus/focus-ring.js 双段动画 ---- */
+/* 600ms 总时长：0-25% grow（150ms）+ 25-100% shrink（450ms），3px 宽，外扩 2px */
+@keyframes md3-focus-grow {
+    from { outline-width: 0; }
+    to { outline-width: 3px; }
+}
+
+:root[data-theme="md3"] .ena-btn:focus-visible,
+:root[data-theme="md3"] .theme-card:focus-visible,
+:root[data-theme="md3"] .ena-input:focus-visible,
+:root[data-theme="md3"] .ena-select:focus-visible,
+:root[data-theme="md3"] .search-tab:focus-visible,
+:root[data-theme="md3"] .side-nav a:focus-visible,
+:root[data-theme="md3"] .song-menu-item:focus-visible {
+    outline: 3px solid var(--md3-primary);
+    outline-offset: 2px;
+    animation: md3-focus-pulse 600ms var(--ease-standard) both;
+}
+
+@keyframes md3-focus-pulse {
+    0% { outline-color: var(--md3-primary); }
+    25% { outline-color: var(--md3-primary); }
+    100% { outline-color: color-mix(in srgb, var(--md3-primary) 100%, transparent); }
+}
+
+/* ---- Switch 视觉（MSCD 用 checkbox，转为 MD3 switch 外观） ---- */
+/* material-esm switch.js：track 52x32 全药丸，handle 16px→24px 选中态，250ms standard */
+:root[data-theme="md3"] .ena-checkbox input[type="checkbox"] {
+    appearance: none;
+    position: absolute;
+    opacity: 0;
+}
+
+:root[data-theme="md3"] .ena-checkbox .box {
+    width: 52px;
+    height: 32px;
+    border-radius: 9999px;
+    border: 2px solid var(--md3-outline);
+    background: var(--md3-surface-container-highest);
+    position: relative;
+    transition: background-color 250ms var(--ease-standard), border-color 250ms var(--ease-standard);
+    flex-shrink: 0;
+}
+
+/* handle 圆点 */
+:root[data-theme="md3"] .ena-checkbox .box::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 9999px;
+    background: var(--md3-outline);
+    transition: left 250ms var(--ease-standard), width 250ms var(--ease-standard), height 250ms var(--ease-standard), background-color 250ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-checkbox input:checked + .box {
+    background: var(--md3-primary);
+    border-color: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .ena-checkbox input:checked + .box::after {
+    left: 24px;
+    width: 24px;
+    height: 24px;
+    background: var(--md3-on-primary);
+}
+
+/* 按下 handle 增大（material-esm pressed handle 28px） */
+:root[data-theme="md3"] .ena-checkbox:active input:not(:checked) + .box::after {
+    width: 28px;
+    height: 28px;
+}
+
+:root[data-theme="md3"] .ena-checkbox:active input:checked + .box::after {
+    width: 28px;
+    height: 28px;
+}
+
+/* ---- Linear progress：material-esm 500ms cubic-bezier(0,0,0.2,1) 进度过渡 ---- */
+:root[data-theme="md3"] .player-progress-bar,
+:root[data-theme="md3"] .ena-progress__bar {
+    transition: width 500ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* 下载任务进度条同规范 */
+:root[data-theme="md3"] .task-track__progress,
+:root[data-theme="md3"] .task-track__progress-bar {
+    transition: width 500ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ---- Switch 状态层色 ---- */
+:root[data-theme="md3"] .ena-checkbox:hover .box {
+    border-color: var(--md3-on-surface-variant);
+}
+
+:root[data-theme="md3"] .ena-checkbox:hover input:checked + .box {
+    border-color: var(--md3-primary);
+    background: color-mix(in srgb, var(--md3-primary) 92%, var(--md3-surface) 8%);
+}
+
+/* ---- reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .loading-bars,
+    :root[data-theme="md3"] .side-tree-loading,
+    :root[data-theme="md3"] .loading-bars span,
+    :root[data-theme="md3"] .side-tree-loading span {
+        animation-duration: 2000ms;
+    }
+
+    :root[data-theme="md3"] .ena-btn:focus-visible,
+    :root[data-theme="md3"] .theme-card:focus-visible,
+    :root[data-theme="md3"] .ena-input:focus-visible,
+    :root[data-theme="md3"] .search-tab:focus-visible,
+    :root[data-theme="md3"] .side-nav a:focus-visible {
+        animation: none;
+    }
+}
