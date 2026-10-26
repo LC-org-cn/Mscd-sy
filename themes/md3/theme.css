@@ -2166,3 +2166,192 @@ html[data-theme="md3"]::view-transition-group(md3-content) {
         animation: none;
     }
 }
+
+
+/* ==================== v8：material-esm 终极对齐（dialog 编排/bottom-sheet/text-field/icon-button） ==================== */
+
+/* ---- Dialog：dialog/internal/animations.js 完整编排 ---- */
+/* 开启：容器 translateY(-50px)→0 500ms EMPHASIZED + scrim 0→.32 500ms linear + 标题/正文 250ms 错峰淡入 + 按钮 300ms */
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel {
+    animation: md3-dialog-slide-in 500ms var(--ease-emphasized) both;
+}
+
+@keyframes md3-dialog-slide-in {
+    from { transform: translateY(-50px); opacity: 0; }
+    10% { opacity: 1; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* scrim：0.32 遮罩（material-esm 规范值，作用于 overlay 层避免双层） */
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__overlay {
+    background: color-mix(in srgb, #000 32%, transparent);
+    opacity: 1;
+    transition: opacity 500ms linear;
+}
+
+/* 移动端 scrim 加快 */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__overlay {
+        transition-duration: 300ms;
+    }
+}
+
+/* 标题错峰：250ms，20% 处仍不可见 */
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__header {
+    animation: md3-children-fade 250ms linear 60ms both;
+}
+
+@keyframes md3-children-fade {
+    0% { opacity: 0; }
+    20% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* 正文错峰 */
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__body {
+    animation: md3-children-fade 250ms linear 100ms both;
+}
+
+/* 按钮区错峰：300ms，50% 处仍不可见 */
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__footer {
+    animation: md3-actions-fade 300ms linear 140ms both;
+}
+
+@keyframes md3-actions-fade {
+    0% { opacity: 0; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* ---- Bottom sheet：bottom-sheet.js 时序（300ms standard 开 / 200ms accelerate 关） ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel {
+        animation: md3-sheet-in 300ms var(--ease-standard) both;
+    }
+
+    @keyframes md3-sheet-in {
+        from { transform: translateY(100%); opacity: 1; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* 移动端子元素错峰缩短 */
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__header,
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__body,
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__footer {
+        animation-duration: 200ms;
+        animation-delay: 80ms;
+    }
+}
+
+/* ---- Text field：text-field.js 聚焦指示线 1px→3px ---- */
+:root[data-theme="md3"] .ena-input:focus,
+:root[data-theme="md3"] .ena-select:focus {
+    border-bottom: 3px solid var(--md3-primary);
+    padding-bottom: calc(0.5rem - 1px);
+}
+
+/* 聚焦从左 1/3 处展开（material-esized filled field 行为近似） */
+@keyframes md3-indicator-grow {
+    from { clip-path: inset(0 66% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+}
+
+:root[data-theme="md3"] .ena-input:focus,
+:root[data-theme="md3"] .ena-select:focus {
+    animation: md3-indicator-grow 180ms var(--ease-standard) both;
+}
+
+/* 下拉触发器同规范 */
+:root[data-theme="md3"] .ena-dropdown__trigger:focus-within {
+    border-bottom: 3px solid var(--md3-primary);
+}
+
+/* ---- Icon button 变体：icon-button.js filled/tonal/outlined/standard ---- */
+/* standard：透明底，hover 状态层 */
+/* filled：primary 底（已有 .ena-btn--primary） */
+/* tonal：secondary-container 底 */
+:root[data-theme="md3"] .ena-btn--icon.ena-btn--primary.tonal,
+:root[data-theme="md3"] .ena-btn--icon.tonal {
+    background: var(--md3-secondary-container);
+    color: var(--md3-on-secondary-container);
+}
+
+:root[data-theme="md3"] .ena-btn--icon.tonal:hover {
+    background: color-mix(in srgb, var(--md3-secondary-container) 88%, var(--md3-on-secondary-container) 12%);
+}
+
+/* outlined：1px outline 边 */
+:root[data-theme="md3"] .ena-btn--icon.outlined {
+    background: transparent;
+    border: 1px solid var(--md3-outline);
+    color: var(--md3-on-surface-variant);
+}
+
+:root[data-theme="md3"] .ena-btn--icon.outlined:hover {
+    background: color-mix(in srgb, var(--md3-on-surface-variant) 8%, transparent);
+}
+
+/* toggle 选中态（icon-button.js selected）：primary 底反转 */
+:root[data-theme="md3"] .ena-btn--icon.is-selected {
+    background: var(--md3-primary);
+    color: var(--md3-on-primary);
+}
+
+:root[data-theme="md3"] .ena-btn--icon.is-selected:hover {
+    background: color-mix(in srgb, var(--md3-primary) 88%, var(--md3-on-primary) 12%);
+}
+
+/* ---- 下拉展开动画：menu.js 200ms cubic-bezier(0.2,0,0,1) 圆角过渡 ---- */
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .ena-dropdown__menu {
+    transition:
+        clip-path 200ms var(--ease-standard),
+        transform 200ms var(--ease-standard),
+        opacity 150ms linear,
+        border-radius 200ms var(--ease-standard),
+        visibility 0s linear .2s;
+}
+
+/* ---- 歌曲行：list 规范 8px 上下 padding 的悬停状态层 ---- */
+:root[data-theme="md3"] .song-row {
+    transition: background-color 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .song-row:hover {
+    background: color-mix(in srgb, var(--md3-on-surface) 8%, transparent);
+}
+
+/* ---- 播放键 hover 阴影：elevation 1 级 ---- */
+:root[data-theme="md3"] .player-play:hover {
+    box-shadow: var(--md3-shadow-1);
+}
+
+/* ---- Tooltip：material-esm 延迟出现（长按悬停 500ms 感） ---- */
+:root[data-theme="md3"] .app-tooltip {
+    transition: opacity 150ms var(--ease-standard), transform 150ms var(--ease-standard);
+}
+
+/* ---- 分隔线：divider 规范 1px + 8% on-surface ---- */
+:root[data-theme="md3"] .ena-divider,
+:root[data-theme="md3"] hr,
+:root[data-theme="md3"] .settings-section + .settings-section {
+    border-color: color-mix(in srgb, var(--md3-on-surface) 12%, transparent);
+}
+
+/* ---- 顶栏：scroll elevation（MD3 app bar 滚动抬升） ---- */
+:root[data-theme="md3"] .top-bar {
+    transition: box-shadow 200ms var(--ease-standard), background-color 450ms var(--ease-standard);
+}
+
+/* ---- reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel,
+    :root[data-theme="md3"] .ena-modal.is-open,
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__header,
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__body,
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__footer,
+    :root[data-theme="md3"] .ena-input:focus,
+    :root[data-theme="md3"] .ena-select:focus {
+        animation: none;
+    }
+}
