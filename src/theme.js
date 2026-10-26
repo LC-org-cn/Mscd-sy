@@ -230,6 +230,7 @@ export function generateMd3Vars(themeHex, mode = 'auto') {
             '--md3-on-error-container': '#410e0b',
             '--md3-inverse-surface': hslToHex(h, cN, 0.20),
             '--md3-inverse-on-surface': hslToHex(h, cN, 0.95),
+            '--md3-on-surface': hslToHex(h, cN, 0.12),
             '--md3-primary-hover': hsla(h, cP, 0.40, 0.10),
 
             '--fill': primary,
@@ -288,6 +289,7 @@ export function generateMd3Vars(themeHex, mode = 'auto') {
         '--md3-on-error-container': '#f9dedc',
         '--md3-inverse-surface': hslToHex(h, cN, 0.90),
         '--md3-inverse-on-surface': hslToHex(h, cN, 0.15),
+        '--md3-on-surface': hslToHex(h, cN, 0.92),
         '--md3-primary-hover': hsla(h, cP, 0.80, 0.10),
 
         '--fill': primary,

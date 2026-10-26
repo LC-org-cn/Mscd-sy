@@ -1,162 +1,154 @@
 /*
- * md3 - Material Design 3 (Material You) 主题
+ * md3 - Material Design 3 (Material You) 主题 v2
  *
- * 基线配色为 MD3 基线种子 #6750A4 的完整 tonal palette：
- *   - 表面采用 tonal elevation 阶梯（surface-container 系列）替代投影分层
- *   - 主色遵循 primary / on-primary 语义（暗色为浅底深字）
- *   - 形状遵循 MD3 shape scale：按钮药丸、菜单/输入 4px、卡片 12px、对话框 28px
- *   - 交互悬停改为状态层（state layer）叠加，而非整块填充
+ * 较 v1 的升级：
+ *   - 全局 motion 令牌重定义：--ease-standard / --ease-emphasized / --duration-*
+ *     全部换成 MD3 motion 规范曲线与时长分级，styles.css 中所有引用这些
+ *     令牌的动画（播放条出入场、模态、菜单、Toast、列表悬停…）随之切换
+ *     为 MD3 手感；另补充 emphasized-decelerate / accelerate 编排曲线。
+ *   - 状态层全部改为 color-mix 动态派生：悬停 8% / 按下 12%，随用户
+ *     自选主题色（generateMd3Vars 注入的 --md3-* 变量）自动跟色。
+ *   - 排版换 Material 排版栈（Roboto / Noto Sans SC / 系统黑体）。
+ *   - 组件覆盖补全：Tooltip、音量弹层、分页/筛选芯片、下拉触发器、
+ *     歌词、移动端底部导航 pill indicator、滚动条、焦点环、滑杆、
+ *     模态 emphasized 编排等。
  *
- * 仅重定义 tokens.css / styles.css 消费的变量并做少量结构覆盖；
- * 布局与交互逻辑零改动，移动端沿用基础断点自动生效。
- * 用户在设置中自选主题色时，由 theme.js 的 generateMd3Vars 按同一
- * tonal 规则派生全套变量（Material You 动态取色）。
+ * 仍然只重定义变量并做样式覆盖，布局与交互逻辑零改动；
+ * 移动端沿用基础断点自动生效。
  */
 
-/* ==================== 明亮模式 ==================== */
+/* ==================== 全局 motion 令牌（模式无关） ==================== */
 :root[data-theme="md3"] {
-    /* MD3 基线 palette（种子 #6750A4） */
+    /* MD3 easing */
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+    /* MD3 duration 分级 */
+    --duration-fast: 100ms;   /* short2 */
+    --duration-base: 250ms;   /* medium1 */
+    --duration-slow: 400ms;   /* medium4 */
+    --md3-dur-short: 150ms;   /* short4 */
+    --md3-dur-medium: 300ms;  /* medium2 */
+    --md3-dur-long: 500ms;    /* long2 */
+
+    /* 状态层原语（color-mix 随动态色自动派生） */
+    --md3-state-hover: color-mix(in srgb, var(--md3-primary) 8%, transparent);
+    --md3-state-press: color-mix(in srgb, var(--md3-primary) 12%, transparent);
+    --md3-state-hover-strong: color-mix(in srgb, var(--md3-primary) 16%, transparent);
+    --md3-focus-ring: var(--md3-primary);
+
+    /* MD3 elevation 阴影（dark 模式块内再弱化） */
+    --md3-shadow-2: 0 2px 6px 2px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12);
+    --md3-shadow-3: 0 4px 8px 3px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* ==================== 明亮模式 palette（种子 #6750A4） ==================== */
+:root[data-theme="md3"] {
     --md3-primary: #6750a4;
     --md3-on-primary: #ffffff;
     --md3-primary-container: #eaddff;
     --md3-on-primary-container: #21005d;
     --md3-secondary-container: #e8def8;
     --md3-on-secondary-container: #1d192b;
+    --md3-tertiary-container: #ffd8e4;
+    --md3-on-tertiary-container: #31111d;
     --md3-error-container: #f9dedc;
     --md3-on-error-container: #410e0b;
     --md3-inverse-surface: #322f35;
     --md3-inverse-on-surface: #f5eff7;
-    --md3-primary-hover: rgba(103, 80, 164, 0.10);
+    --md3-on-surface: #1d1b20;
+
+    /* 排版：Material 排版栈 */
+    --font-body: 'Roboto', 'Noto Sans SC', 'HarmonyOS Sans SC', 'MiSans', 'Microsoft YaHei UI', 'PingFang SC', system-ui, -apple-system, sans-serif;
+    --font-display: 'Roboto', 'Noto Sans SC', 'Microsoft YaHei UI', 'PingFang SC', system-ui, sans-serif;
+
+    /* 表面 tonal 阶梯 */
+    --bg-page: #fef7ff;
+    --bg-top: #f3edf7;
+    --bg-side: #f7f2fa;
+    --bg-player: #f3edf7;
+    --bg-input: #ece6f0;
+    --bg-menu: #ece6f0;
+    --bg-float: #ece6f0;
+    --bg-overlay: rgba(236, 230, 240, 0.95);
+    --bg-surface: #f7f2fa;
+    --bg-surface-hover: #ece6f0;
+    --bg-subtle: rgba(29, 27, 32, 0.04);
+    --bg-cover: #e6e0e9;
+    --bg-wipe: #e6e0e9;
+
+    /* 文本 */
+    --text-primary: #1d1b20;
+    --text-secondary: #49454f;
+    --text-tertiary: #79747e;
+
+    /* 边框 / 分隔线 */
+    --border: #cac4d0;
+    --border-strong: #79747e;
+    --border-faint: rgba(202, 196, 208, 0.55);
+    --border-line: #79747e;
+
+    /* 填充 / 强调 */
+    --fill: var(--md3-primary);
+    --fill-light: #e6e0e9;
+    --on-accent: var(--md3-on-primary);
+    --on-accent-muted: rgba(103, 80, 164, 0.7);
+    --on-accent-faint: rgba(103, 80, 164, 0.62);
+    --hover-bg: rgba(29, 27, 32, 0.08);
+    --hover-text: var(--md3-primary);
+
+    /* 轨道 / 进度 */
+    --progress-track: rgba(29, 27, 32, 0.12);
+    --progress-track-hover: rgba(29, 27, 32, 0.2);
+    --range-track: rgba(29, 27, 32, 0.14);
+    --waveform: #1d1b20;
+
+    /* 滚动条 */
+    --scrollbar-thumb: #cac4d0;
+    --scrollbar-thumb-hover: #79747e;
+
+    /* 遮罩 / 阴影 */
+    --scrim: rgba(0, 0, 0, 0.42);
+    --shadow-color: rgba(0, 0, 0, 0.12);
+    --overlay-cover: rgba(0, 0, 0, 0.45);
+    --overlay-detail: rgba(254, 247, 255, 0.72);
+    --cover-overlay: rgba(0, 0, 0, 0.35);
+
+    /* 封面文字（深底浅字不变语义） */
+    --on-cover-strong: rgba(255, 255, 255, 0.9);
+    --on-cover: rgba(255, 255, 255, 0.72);
+    --on-cover-shadow: rgba(0, 0, 0, 0.85);
+    --on-cover-shadow-weak: rgba(0, 0, 0, 0.6);
+    --on-dark-icon: rgba(255, 255, 255, 0.85);
+
+    /* 语义色（MD3 自定义色板） */
+    --success: #0f6d36;
+    --warning: #815600;
+    --danger: #b3261e;
+    --info: #0b57d0;
+
+    /* 结构杂项 */
+    --tree-bg-2: rgba(29, 27, 32, 0.04);
+    --tree-bg-3: rgba(29, 27, 32, 0.08);
+    --selection-box-bg: color-mix(in srgb, var(--md3-primary) 12%, transparent);
 
     /* 暗色模式下仍需浅色参考的场景 */
     --bg-float-light: #ece6f0;
     --bg-overlay-light: rgba(236, 230, 240, 0.95);
     --bg-page-light: #fef7ff;
-    --bg-subtle-light: rgba(29, 27, 32, 0.03);
-    --border-faint-light: rgba(202, 196, 208, 0.5);
-    --progress-track-hover-light: rgba(29, 27, 32, 0.16);
-    --progress-track-light: rgba(29, 27, 32, 0.10);
-    --range-track-light: rgba(29, 27, 32, 0.12);
+    --bg-subtle-light: rgba(29, 27, 32, 0.04);
+    --border-faint-light: rgba(202, 196, 208, 0.55);
+    --progress-track-hover-light: rgba(29, 27, 32, 0.2);
+    --progress-track-light: rgba(29, 27, 32, 0.12);
+    --range-track-light: rgba(29, 27, 32, 0.14);
     --scrollbar-thumb-light: #cac4d0;
-    --text-primary-light: #1d1b20;
-
-    /* MD3 动效 */
-    --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
-    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-    --duration-fast: 120ms;
-    --duration-base: 250ms;
-    --duration-slow: 350ms;
-
-    /* 字体沿用应用本体 */
-    --font-body: 'LXGW WenKai Light', system-ui, -apple-system, sans-serif;
-    --font-display: 'Poiret One', system-ui, sans-serif;
-    --font-mono: ui-monospace, monospace;
-    --font-pixel: 'FusionPixel', system-ui, sans-serif;
-
-    --on-accent: var(--md3-on-primary);
-    --on-accent-faint: rgba(255, 255, 255, 0.62);
-    --on-accent-muted: rgba(255, 255, 255, 0.70);
-
-    /* MD3 shape scale */
-    --radius-base: 4px;
-    --radius-xs: 4px;
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    --radius-xl: 28px;
-    --radius-xxl: 28px;
-    --radius-full: 50%;
-    --radius-button: 999px;
-    --radius-input: 4px;
-    --radius-card: 12px;
-    --radius-cover: 8px;
-    --radius-modal: 28px;
-    --radius-menu: 4px;
-    --radius-row: 8px;
-    --radius-header: 16px;
-    --radius-player: 0;
-    --radius-nav: 999px;
-    --radius-panel: 16px;
-    --radius-toast: 4px;
-    --theme-card-radius: 12px;
-
-    --space-1: 4px;
-    --space-2: 8px;
-    --space-3: 12px;
-    --space-4: 16px;
-    --space-5: 24px;
-    --space-6: 32px;
-
-    --text-primary: #1d1b20;
-    --text-secondary: #49454f;
-    --text-tertiary: #79747e;
-    --border: #cac4d0;
-    --border-strong: #79747e;
-    --fill: var(--md3-primary);
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #b3261e;
-    --info: #3b82f6;
-    --bg-page: #fef7ff;
 
     color-scheme: light;
-
-    /* 表面阶梯（tonal elevation） */
-    --bg-top: #f3edf7;
-    --bg-side: #f7f2fa;
-    --bg-player: #f3edf7;
-    --bg-input: #e6e0e9;
-    --bg-menu: #ece6f0;
-    --bg-float: #ece6f0;
-    --border-line: var(--md3-primary);
-
-    --sidebar-width: 260px;
-    --top-bar-height: 64px;
-    --player-bar-height: 64px;
-    --mobile-nav-height: 46px;
-    --content-pad-x: 28px;
-    --fill-light: rgba(103, 80, 164, 0.10);
-
-    --bg-overlay: rgba(236, 230, 240, 0.95);
-    --bg-surface: #f7f2fa;
-    --bg-surface-hover: #f3edf7;
-    --bg-subtle: rgba(29, 27, 32, 0.04);
-    --bg-cover: #e6e0e9;
-    --bg-wipe: #ece6f0;
-    --hover-bg: rgba(29, 27, 32, 0.08);
-    --border-faint: rgba(202, 196, 208, 0.5);
-    --progress-track: rgba(29, 27, 32, 0.10);
-    --progress-track-hover: rgba(29, 27, 32, 0.16);
-    --range-track: rgba(29, 27, 32, 0.12);
-    --overlay-cover: rgba(0, 0, 0, 0.5);
-    --overlay-detail: rgba(254, 247, 255, 0.72);
-    --waveform: #1d1b20;
-    --hover-text: var(--md3-primary);
-    --scrollbar-thumb: #cac4d0;
-    --scrollbar-thumb-hover: #79747e;
-    --scrim: rgba(0, 0, 0, 0.4);
-    --tree-bg-2: rgba(29, 27, 32, 0.03);
-    --tree-bg-3: rgba(29, 27, 32, 0.06);
-    --shadow-color: rgba(0, 0, 0, 0.15);
-    --cover-overlay: rgba(0, 0, 0, 0.35);
-    --on-cover-strong: rgba(255, 255, 255, 0.85);
-    --on-cover: rgba(255, 255, 255, 0.7);
-    --on-cover-shadow: rgba(0, 0, 0, 0.85);
-    --on-cover-shadow-weak: rgba(0, 0, 0, 0.6);
-    --on-dark-icon: rgba(255, 255, 255, 0.8);
-    --selection-box-bg: rgba(103, 80, 164, 0.12);
-    --mv-surface: #1a1a1a;
-    --mv-text-primary: #f5f5f5;
-    --mv-text-secondary: rgba(255, 255, 255, 0.75);
-    --mv-text-tertiary: rgba(255, 255, 255, 0.5);
-    --mv-progress-track: rgba(255, 255, 255, 0.2);
-    --mv-progress-track-hover: rgba(255, 255, 255, 0.3);
-    --mv-hover-bg: rgba(255, 255, 255, 0.12);
-    --mv-border: rgba(255, 255, 255, 0.3);
-    --playback-cover-shadow: 0 0 0 1px var(--border-faint-light), 1px 1px 0 rgba(0,0,0,0.028), 2px 2px 0 rgba(0,0,0,0.027), 3px 3px 0 rgba(0,0,0,0.026), 4px 4px 0 rgba(0,0,0,0.025), 5px 5px 0 rgba(0,0,0,0.024), 6px 6px 0 rgba(0,0,0,0.023), 7px 7px 0 rgba(0,0,0,0.022), 8px 8px 0 rgba(0,0,0,0.021), 9px 9px 0 var(--bg-subtle-light), 10px 10px 0 rgba(0,0,0,0.019), 11px 11px 0 rgba(0,0,0,0.018), 12px 12px 0 rgba(0,0,0,0.017), 13px 13px 0 rgba(0,0,0,0.016), 14px 14px 0 rgba(0,0,0,0.015), 15px 15px 0 rgba(0,0,0,0.014), 16px 16px 0 rgba(0,0,0,0.013), 17px 17px 0 rgba(0,0,0,0.012), 18px 18px 0 rgba(0,0,0,0.011), 19px 19px 0 rgba(0,0,0,0.01), 20px 20px 0 rgba(0,0,0,0.009), 21px 21px 0 rgba(0,0,0,0.008), 22px 22px 0 rgba(0,0,0,0.007), 23px 23px 0 rgba(0,0,0,0.006), 24px 24px 0 rgba(0,0,0,0.005), 25px 25px 0 rgba(0,0,0,0.0045), 26px 26px 0 rgba(0,0,0,0.004), 27px 27px 0 rgba(0,0,0,0.0035), 28px 28px 0 rgba(0,0,0,0.003), 29px 29px 0 rgba(0,0,0,0.0025), 30px 30px 0 rgba(0,0,0,0.002), 31px 31px 0 rgba(0,0,0,0.0018), 32px 32px 0 rgba(0,0,0,0.0016), 33px 33px 0 rgba(0,0,0,0.0014), 34px 34px 0 rgba(0,0,0,0.0012), 35px 35px 0 rgba(0,0,0,0.001);
 }
 
-/* ==================== 暗色模式 ==================== */
+/* ==================== 暗色模式 palette ==================== */
 :root[data-theme="md3"][data-mode="dark"] {
     color-scheme: dark;
     --md3-primary: #d0bcff;
@@ -165,11 +157,13 @@
     --md3-on-primary-container: #eaddff;
     --md3-secondary-container: #4a4458;
     --md3-on-secondary-container: #e8def8;
+    --md3-tertiary-container: #633b48;
+    --md3-on-tertiary-container: #ffd8e4;
     --md3-error-container: #8c1d18;
     --md3-on-error-container: #f9dedc;
     --md3-inverse-surface: #e6e0e9;
     --md3-inverse-on-surface: #322f35;
-    --md3-primary-hover: rgba(208, 188, 255, 0.10);
+    --md3-on-surface: #e6e0e9;
 
     --bg-page: #141218;
     --bg-top: #211f26;
@@ -180,58 +174,72 @@
     --bg-float: #2b2930;
     --bg-overlay: rgba(43, 41, 48, 0.95);
     --bg-surface: #1d1b20;
-    --bg-surface-hover: #211f26;
+    --bg-surface-hover: #2b2930;
     --bg-subtle: rgba(230, 224, 233, 0.05);
     --bg-cover: #36343b;
     --bg-wipe: #211f26;
+
     --text-primary: #e6e0e9;
     --text-secondary: #cac4d0;
     --text-tertiary: #938f99;
+
     --border: #49454f;
     --border-strong: #938f99;
     --border-faint: rgba(73, 69, 79, 0.6);
+    --border-line: #938f99;
+
     --fill: var(--md3-primary);
-    --fill-light: rgba(208, 188, 255, 0.10);
-    --hover-bg: rgba(230, 224, 233, 0.08);
-    --hover-text: var(--md3-primary);
-    --border-line: var(--md3-primary);
-    --progress-track: rgba(230, 224, 233, 0.14);
-    --progress-track-hover: rgba(230, 224, 233, 0.2);
-    --range-track: rgba(230, 224, 233, 0.18);
-    --overlay-cover: rgba(0, 0, 0, 0.6);
-    --overlay-detail: rgba(20, 18, 24, 0.8);
-    --waveform: #e6e0e9;
-    --scrollbar-thumb: #49454f;
-    --scrollbar-thumb-hover: #706b75;
-    --scrim: rgba(0, 0, 0, 0.6);
-    --tree-bg-2: rgba(230, 224, 233, 0.04);
-    --tree-bg-3: rgba(230, 224, 233, 0.08);
-    --success: hsl(158, 64%, 45%);
-    --warning: hsl(38, 92%, 55%);
-    --danger: #f2b8b5;
-    --info: hsl(214, 90%, 66%);
+    --fill-light: rgba(208, 188, 255, 0.1);
     --on-accent: var(--md3-on-primary);
     --on-accent-muted: rgba(56, 30, 114, 0.75);
-    --on-accent-faint: rgba(56, 30, 114, 0.70);
+    --on-accent-faint: rgba(56, 30, 114, 0.7);
+    --hover-bg: rgba(230, 224, 233, 0.08);
+    --hover-text: var(--md3-primary);
+
+    --progress-track: rgba(230, 224, 233, 0.14);
+    --progress-track-hover: rgba(230, 224, 233, 0.22);
+    --range-track: rgba(230, 224, 233, 0.18);
+    --waveform: #e6e0e9;
+
+    --scrollbar-thumb: #49454f;
+    --scrollbar-thumb-hover: #706b75;
+
+    --scrim: rgba(0, 0, 0, 0.6);
     --shadow-color: rgba(0, 0, 0, 0.45);
+    --overlay-cover: rgba(0, 0, 0, 0.6);
+    --overlay-detail: rgba(20, 18, 24, 0.8);
     --cover-overlay: rgba(0, 0, 0, 0.5);
-    --on-cover-strong: rgba(255, 255, 255, 0.92);
-    --on-cover: rgba(255, 255, 255, 0.75);
-    --on-cover-shadow: rgba(0, 0, 0, 0.8);
-    --on-cover-shadow-weak: rgba(0, 0, 0, 0.6);
-    --on-dark-icon: rgba(255, 255, 255, 0.85);
-    --selection-box-bg: rgba(208, 188, 255, 0.16);
+
+    --success: #a9d6b5;
+    --warning: #fcc02d;
+    --danger: #f2b8b5;
+    --info: #a8c7fa;
+
+    --tree-bg-2: rgba(230, 224, 233, 0.04);
+    --tree-bg-3: rgba(230, 224, 233, 0.08);
+    --selection-box-bg: color-mix(in srgb, var(--md3-primary) 16%, transparent);
+
+    /* 暗色下阴影弱化，层级靠表面阶梯 */
+    --md3-shadow-2: 0 2px 6px 2px rgba(0, 0, 0, 0.28), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --md3-shadow-3: 0 4px 8px 3px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 /* ==================== 结构覆盖 ==================== */
 
-/* ---- 按钮：tonal 药丸 + 状态层悬停 ---- */
+/* ---- 全局：顶栏品牌字与粗细 ---- */
+:root[data-theme="md3"] .top-bar-title {
+    font-weight: 500;
+    letter-spacing: 1.5px;
+}
+
+/* ---- 按钮：tonal 药丸 + 状态层 + 按下缩放 ---- */
 :root[data-theme="md3"] .ena-btn {
     border-bottom: none;
     background: var(--md3-secondary-container);
     color: var(--md3-on-secondary-container);
     font-weight: 500;
     letter-spacing: .3px;
+    transition: background-color .15s var(--ease-standard), color .15s var(--ease-standard), transform .12s var(--ease-standard), border-radius .15s var(--ease-standard), opacity .15s var(--ease-standard);
 }
 
 :root[data-theme="md3"] .ena-btn::before {
@@ -247,15 +255,18 @@
 
 :root[data-theme="md3"] .ena-btn:hover::before {
     height: 100%;
-    opacity: .10;
+    opacity: .1;
 }
 
-:root[data-theme="md3"] .ena-btn:focus-visible {
-    outline: 2px solid var(--fill);
-    outline-offset: 2px;
+:root[data-theme="md3"] .ena-btn:active {
+    transform: scale(.97);
 }
 
-/* filled primary：实心主色 + 白色状态层 */
+:root[data-theme="md3"] .ena-btn:active::before {
+    opacity: .13;
+}
+
+/* filled primary：实心主色 + on 色状态层 */
 :root[data-theme="md3"] .ena-btn--primary {
     background: var(--fill);
     color: var(--on-accent);
@@ -274,7 +285,11 @@
     opacity: .12;
 }
 
-/* danger：错误容器色 tonal */
+:root[data-theme="md3"] .ena-btn--primary:active::before {
+    opacity: .16;
+}
+
+/* danger：错误容器 tonal */
 :root[data-theme="md3"] .ena-btn--danger {
     background: var(--md3-error-container);
     color: var(--md3-on-error-container);
@@ -290,386 +305,728 @@
 
 :root[data-theme="md3"] .ena-btn--danger:hover::before {
     height: 100%;
-    opacity: .10;
+    opacity: .1;
 }
 
 /* ghost：无底色，主色状态层 */
 :root[data-theme="md3"] .ena-btn--ghost {
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--md3-primary);
 }
 
 :root[data-theme="md3"] .ena-btn--ghost::before {
-    background: var(--md3-primary-hover);
+    background: var(--md3-primary);
 }
 
 :root[data-theme="md3"] .ena-btn--ghost:hover {
-    color: var(--fill);
+    color: var(--md3-primary);
 }
 
-/* 图标按钮：透明底圆形，涟漪沿用基础机制，状态层改主色 */
+:root[data-theme="md3"] .ena-btn--ghost:hover::before {
+    height: 100%;
+    opacity: .1;
+}
+
+/* 禁用 */
+:root[data-theme="md3"] .ena-btn:disabled {
+    background: color-mix(in srgb, var(--md3-on-surface) 12%, transparent);
+    color: color-mix(in srgb, var(--md3-on-surface) 38%, transparent);
+}
+
+/* 图标按钮：圆形状态层 */
 :root[data-theme="md3"] .ena-btn--icon {
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--md3-primary);
 }
 
 :root[data-theme="md3"] .ena-btn--icon::before {
-    background: var(--md3-primary-hover);
-    border-radius: 999px;
+    background: var(--md3-primary);
+    opacity: 0;
+    height: 100%;
+    transition: opacity .15s var(--ease-standard);
 }
 
-:root[data-theme="md3"] .ena-btn--icon:hover {
-    color: var(--fill);
+:root[data-theme="md3"] .ena-btn--icon:hover::before {
+    height: 100%;
+    opacity: .1;
 }
 
-/* 图标 primary（播放键等）：实心主色圆 */
+:root[data-theme="md3"] .ena-btn--icon:active::before {
+    opacity: .14;
+}
+
+:root[data-theme="md3"] .ena-btn--icon:active {
+    transform: scale(.94);
+}
+
+/* 图标 + primary：实心主色圆（播放键） */
 :root[data-theme="md3"] .ena-btn--icon.ena-btn--primary {
     background: var(--fill);
     color: var(--on-accent);
+    box-shadow: var(--md3-shadow-2);
 }
 
 :root[data-theme="md3"] .ena-btn--icon.ena-btn--primary::before {
     background: var(--on-accent);
-    transform: scale(1);
-    opacity: 0;
-    transition: opacity .15s var(--ease-standard), transform .22s var(--ease-standard);
-}
-
-:root[data-theme="md3"] .ena-btn--icon.ena-btn--primary:hover {
-    color: var(--on-accent);
 }
 
 :root[data-theme="md3"] .ena-btn--icon.ena-btn--primary:hover::before {
-    transform: scale(1);
+    height: 100%;
     opacity: .12;
 }
 
-/* ---- 侧边导航：全药丸，淡入状态层（MD3 导航抽屉） ---- */
-:root[data-theme="md3"] .side-nav a {
-    border-radius: 999px;
+/* ---- 全局焦点环（MD3 focus ring） ---- */
+:root[data-theme="md3"] .ena-btn:focus-visible,
+:root[data-theme="md3"] .ena-input:focus-visible,
+:root[data-theme="md3"] .ena-select:focus-visible,
+:root[data-theme="md3"] .side-nav a:focus-visible,
+:root[data-theme="md3"] .theme-card:focus-visible,
+:root[data-theme="md3"] .song-row:focus-visible,
+:root[data-theme="md3"] .ena-dropdown__trigger:focus-visible,
+:root[data-theme="md3"] .ena-checkbox input:focus-visible + .box,
+:root[data-theme="md3"] .ena-radio input:focus-visible + .dot {
+    outline: 2px solid var(--md3-focus-ring);
+    outline-offset: 2px;
 }
 
-:root[data-theme="md3"] .side-nav a::before {
-    border-radius: 999px;
-    width: 100%;
-    opacity: 0;
-    background: var(--md3-secondary-container);
-    transition: opacity .15s var(--ease-standard);
-}
-
-:root[data-theme="md3"] .side-nav a:hover,
-:root[data-theme="md3"] .side-nav a.is-active {
-    color: var(--md3-on-secondary-container);
-}
-
-:root[data-theme="md3"] .side-nav a:hover::before {
-    opacity: .5;
-}
-
-:root[data-theme="md3"] .side-nav a.is-active::before {
-    opacity: 1;
-}
-
-/* ---- 搜索页签：居中短药丸指示条，激活文字主色 ---- */
-:root[data-theme="md3"] .search-tab::after {
-    height: 3px;
-    width: 34px;
-    left: 50%;
-    margin-left: -17px;
-    bottom: 7px;
-    border-radius: 3px;
-}
-
-:root[data-theme="md3"] .search-tab.is-active,
-:root[data-theme="md3"] .search-tab.is-active:hover {
-    color: var(--fill);
-}
-
-/* ---- 输入件：filled text field（容器色 + 底部指示线） ---- */
-:root[data-theme="md3"] .ena-input,
-:root[data-theme="md3"] .ena-textarea {
+/* ---- 输入族：filled text field ---- */
+:root[data-theme="md3"] .ena-input {
     background-color: var(--bg-input);
-    background-image: none;
-    border-bottom: 2px solid var(--border);
-    transition: border-color .15s var(--ease-standard), background-color .15s var(--ease-standard);
-}
-
-:root[data-theme="md3"] .ena-input:focus,
-:root[data-theme="md3"] .ena-textarea:focus {
+    border: none;
+    border-bottom: 1px solid var(--md3-on-surface);
+    border-radius: 4px 4px 0 0;
     color: var(--text-primary);
-    border-bottom-color: var(--fill);
+    transition: border-color .15s var(--ease-standard), background-color .15s var(--ease-standard), color .15s var(--ease-standard), box-shadow .15s var(--ease-standard);
 }
 
-:root[data-theme="md3"] .ena-input:focus::placeholder {
+:root[data-theme="md3"] .ena-input:hover {
+    border-bottom-color: var(--md3-on-surface);
+    border-bottom-width: 2px;
+}
+
+:root[data-theme="md3"] .ena-input:focus {
+    background-color: var(--bg-input);
+    border-bottom: 2px solid var(--md3-primary);
+    color: var(--text-primary);
+}
+
+:root[data-theme="md3"] .ena-input::placeholder {
+    color: var(--text-tertiary);
+}
+
+:root[data-theme="md3"] .ena-input-icon {
     color: var(--text-tertiary);
 }
 
 :root[data-theme="md3"] .ena-input-wrap:focus-within .ena-input-icon {
-    color: var(--fill);
+    color: var(--md3-primary);
 }
 
+/* 下拉选择：filled 底 + 模式化箭头 */
 :root[data-theme="md3"] .ena-select {
     background-color: var(--bg-input);
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2349454f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 12px;
-    border-bottom: 2px solid var(--border);
+    border: none;
+    border-bottom: 1px solid var(--md3-on-surface);
+    border-radius: 4px 4px 0 0;
+    color: var(--text-primary);
     transition: border-color .15s var(--ease-standard), background-color .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-select:hover {
+    border-bottom-width: 2px;
 }
 
 :root[data-theme="md3"] .ena-select:focus {
     background-size: 12px;
+    border-bottom: 2px solid var(--md3-primary);
     color: var(--text-primary);
-    border-bottom-color: var(--fill);
 }
 
-/* 暗色模式换浅色箭头（data-uri 无法引用 CSS 变量，分模式注入） */
 :root[data-theme="md3"][data-mode="dark"] .ena-select {
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cac4d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
-/* ---- 选择控件：MD3 圆角勾选框与圆形单选 ---- */
-:root[data-theme="md3"] .ena-checkbox .box,
-:root[data-theme="md3"] .song-select .box {
+/* 视图内搜索框：同为 filled */
+:root[data-theme="md3"] .view-search .ena-input {
+    background-color: var(--bg-input);
+    border: none;
+    border-bottom: 1px solid var(--md3-on-surface);
+    border-radius: 4px 4px 0 0;
+}
+
+:root[data-theme="md3"] .view-search .ena-input:focus {
+    border-bottom: 2px solid var(--md3-primary);
+    background-color: var(--bg-input);
+}
+
+/* 顶栏搜索条：容器药丸；内部件直角补偿 */
+:root[data-theme="md3"] .search-wrap .ena-input,
+:root[data-theme="md3"] .search-wrap .ena-select,
+:root[data-theme="md3"] .search-wrap > .ena-btn {
+    border-radius: 0;
+}
+
+/* ---- 复选 / 单选：2px 圆角 + 主色 ---- */
+:root[data-theme="md3"] .ena-checkbox .box {
     border-radius: 2px;
+    border: 2px solid var(--text-secondary);
+}
+
+:root[data-theme="md3"] .ena-checkbox input:checked + .box {
+    border-color: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .ena-checkbox input:checked + .box::after {
+    clip-path: inset(0 0 0 0);
 }
 
 :root[data-theme="md3"] .ena-radio .dot {
-    border-radius: 50%;
+    border-radius: 999px;
+    border: 2px solid var(--text-secondary);
 }
 
-:root[data-theme="md3"] .ena-checkbox input:focus-visible + .box,
-:root[data-theme="md3"] .ena-radio input:focus-visible + .dot {
-    outline: 2px solid var(--fill);
-    outline-offset: 2px;
+:root[data-theme="md3"] .ena-radio input:checked + .dot {
+    border-color: var(--md3-primary);
 }
 
-/* ---- 滑杆：主色圆钮 ---- */
+/* ---- 滑杆：MD3 slider ---- */
+:root[data-theme="md3"] .ena-range {
+    border-radius: 999px;
+}
+
 :root[data-theme="md3"] .ena-range::-webkit-slider-thumb {
-    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--md3-primary);
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform .15s var(--ease-standard), background-color .15s var(--ease-standard);
 }
 
 :root[data-theme="md3"] .ena-range::-moz-range-thumb {
-    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--md3-primary);
+    border: none;
 }
 
-:root[data-theme="md3"] .ena-range:hover::-webkit-slider-thumb {
-    background: var(--fill);
+:root[data-theme="md3"] .ena-range:hover::-webkit-slider-thumb,
+:root[data-theme="md3"] .ena-range:active::-webkit-slider-thumb {
+    background: var(--md3-primary);
+    transform: scale(1.15);
 }
 
-/* ---- 菜单/列表项：悬停改为主色状态层 ---- */
+:root[data-theme="md3"] .ena-range:active::-webkit-slider-thumb {
+    transform: scale(1.3);
+}
+
+/* ---- 侧边导航：药丸 + 指示层 ---- */
+:root[data-theme="md3"] .side-nav a {
+    border-radius: 999px;
+}
+
+:root[data-theme="md3"] .side-nav a::before {
+    width: 100%;
+    height: 100%;
+    background: var(--md3-primary);
+    opacity: 0;
+    transition: opacity .2s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .side-nav a:hover::before {
+    width: 100%;
+    height: 100%;
+    opacity: .08;
+}
+
+:root[data-theme="md3"] .side-nav a.is-active::before {
+    width: 100%;
+    height: 100%;
+    opacity: .14;
+}
+
+:root[data-theme="md3"] .side-nav a.is-active {
+    color: var(--md3-on-primary-container);
+}
+
+:root[data-theme="md3"] .side-nav a:hover {
+    color: var(--md3-on-primary-container);
+}
+
+/* 展开节点粘头 */
+:root[data-theme="md3"] .side-nav a[data-tree].is-expanded {
+    background-color: var(--bg-side);
+    box-shadow: 0 1px 0 var(--border-faint);
+}
+
+/* 树展开圆钮 */
+:root[data-theme="md3"] .side-nav a .side-tree-toggle::before {
+    border-radius: 999px;
+    background: var(--md3-primary);
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .side-nav a .side-tree-toggle:hover::before {
+    opacity: .1;
+}
+
+/* ---- 歌曲行：状态层 ---- */
+:root[data-theme="md3"] .song-row {
+    background-image: linear-gradient(var(--fill-light), var(--fill-light));
+}
+
+:root[data-theme="md3"] .song-row:hover {
+    background-color: transparent;
+}
+
+:root[data-theme="md3"] .song-row.is-current .song-title,
+:root[data-theme="md3"] .song-row:hover .song-title,
+:root[data-theme="md3"] .song-row:hover .song-artist,
+:root[data-theme="md3"] .song-row:hover .song-album {
+    color: var(--hover-text);
+}
+
+/* 正在播放柱：主色 */
+:root[data-theme="md3"] .song-playing-bars span {
+    background: var(--md3-primary);
+}
+
+/* ---- 菜单族：项目状态层（药丸内缩） ---- */
+:root[data-theme="md3"] .song-menu-item,
+:root[data-theme="md3"] .account-menu__item,
+:root[data-theme="md3"] .view-switcher-item {
+    color: var(--text-secondary);
+    transition: color .15s var(--ease-standard), background-color .15s var(--ease-standard);
+}
+
 :root[data-theme="md3"] .song-menu-item::before,
-:root[data-theme="md3"] .account-menu__item::before,
-:root[data-theme="md3"] .player-more-item::before,
-:root[data-theme="md3"] .multi-select-menu-item::before,
-:root[data-theme="md3"] .mobile-more-item::before,
-:root[data-theme="md3"] .playback-mobile-more-item::before,
-:root[data-theme="md3"] .mv-quality-item::before,
-:root[data-theme="md3"] .view-switcher-item::before,
-:root[data-theme="md3"] .task-filter__btn::before,
-:root[data-theme="md3"] .home-action::before,
-:root[data-theme="md3"] .multi-select-action::before,
-:root[data-theme="md3"] .pagination-page::before {
-    background: var(--md3-primary-hover);
+:root[data-theme="md3"] .account-menu__item::before {
+    height: 100%;
+    background: var(--md3-primary);
+    opacity: 0;
+    transition: opacity .15s var(--ease-standard);
 }
 
 :root[data-theme="md3"] .song-menu-item:hover,
 :root[data-theme="md3"] .account-menu__item:hover,
-:root[data-theme="md3"] .player-more-item:hover,
-:root[data-theme="md3"] .multi-select-menu-item:hover,
-:root[data-theme="md3"] .mobile-more-item:hover,
-:root[data-theme="md3"] .playback-mobile-more-item:hover,
-:root[data-theme="md3"] .mv-quality-item:hover,
-:root[data-theme="md3"] .view-switcher-item:hover,
-:root[data-theme="md3"] .task-filter__btn:hover,
-:root[data-theme="md3"] .home-action:hover,
-:root[data-theme="md3"] .multi-select-action:hover {
+:root[data-theme="md3"] .view-switcher-item:hover {
+    color: var(--md3-on-primary-container);
+    background-color: color-mix(in srgb, var(--md3-primary) 8%, transparent);
+}
+
+:root[data-theme="md3"] .song-menu-item:hover::before,
+:root[data-theme="md3"] .account-menu__item:hover::before {
+    height: 100%;
+    opacity: .08;
+}
+
+:root[data-theme="md3"] .song-menu-item--danger {
+    color: var(--danger);
+}
+
+:root[data-theme="md3"] .song-menu-item--danger::before {
+    background: var(--danger);
+}
+
+:root[data-theme="md3"] .song-menu-item--danger:hover {
+    color: var(--md3-on-error-container);
+}
+
+/* ---- 下拉触发器：filled 药丸化底线 ---- */
+:root[data-theme="md3"] .ena-dropdown__trigger {
+    background-color: var(--bg-input);
+    background-image:
+            url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2349454f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+            linear-gradient(var(--md3-primary), var(--md3-primary));
+    background-repeat: no-repeat, no-repeat;
+    background-origin: border-box;
+    background-position: right 10px center, left bottom;
+    background-size: 12px, 100% 2px;
+    border: none;
+    border-bottom: 1px solid var(--md3-on-surface);
+    border-radius: 4px 4px 0 0;
+    box-shadow: none;
     color: var(--text-primary);
 }
 
-/* ---- Toast：inverse-surface 反色（MD3 snackbar） ---- */
-:root[data-theme="md3"] .ena-toast__body {
-    background: var(--md3-inverse-surface);
-    color: var(--md3-inverse-on-surface);
+:root[data-theme="md3"] .ena-dropdown__trigger:hover {
+    border-bottom-width: 2px;
 }
 
-/* ---- 模态：MD3 对话框 ---- */
+:root[data-theme="md3"] .ena-dropdown.is-open .ena-dropdown__trigger {
+    background-size: 12px, 100% 2px;
+    border-bottom-width: 2px;
+    color: var(--md3-primary);
+}
+
+:root[data-theme="md3"][data-mode="dark"] .ena-dropdown__trigger {
+    background-image:
+            url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cac4d0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+            linear-gradient(var(--md3-primary), var(--md3-primary));
+}
+
+:root[data-theme="md3"][data-mode="dark"] .ena-dropdown.is-open .ena-dropdown__trigger {
+    color: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .ena-dropdown__menu {
+    box-shadow: var(--md3-shadow-2);
+}
+
+:root[data-theme="md3"] .ena-dropdown__item {
+    color: var(--text-secondary);
+    transition: color .15s var(--ease-standard), background-color .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-dropdown__item::before {
+    height: 100%;
+    background: var(--md3-primary);
+    opacity: 0;
+    transition: opacity .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-dropdown__item:hover {
+    color: var(--md3-on-primary-container);
+}
+
+:root[data-theme="md3"] .ena-dropdown__item:hover::before {
+    height: 100%;
+    opacity: .08;
+}
+
+:root[data-theme="md3"] .ena-dropdown__item.is-active {
+    color: var(--md3-primary);
+    background-color: color-mix(in srgb, var(--md3-primary) 12%, transparent);
+}
+
+:root[data-theme="md3"] .ena-dropdown__item.is-active::before {
+    height: 100%;
+    opacity: 0;
+}
+
+/* ---- 分页 / 筛选芯片：MD3 chip 药丸 ---- */
+:root[data-theme="md3"] .pagination-page,
+:root[data-theme="md3"] .task-filter__btn {
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: background-color .15s var(--ease-standard), color .15s var(--ease-standard), box-shadow .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .pagination-page::before,
+:root[data-theme="md3"] .pagination-page::after,
+:root[data-theme="md3"] .task-filter__btn::before,
+:root[data-theme="md3"] .task-filter__btn::after {
+    height: 100%;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .pagination-page::before,
+:root[data-theme="md3"] .task-filter__btn::before {
+    background: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .pagination-page:hover,
+:root[data-theme="md3"] .task-filter__btn:hover {
+    color: var(--md3-on-primary-container);
+}
+
+:root[data-theme="md3"] .pagination-page:hover::before,
+:root[data-theme="md3"] .task-filter__btn:hover::before {
+    opacity: .08;
+    height: 100%;
+}
+
+:root[data-theme="md3"] .pagination-page.is-active,
+:root[data-theme="md3"] .task-filter__btn.is-active {
+    color: var(--md3-on-primary-container);
+    background-color: var(--md3-secondary-container);
+}
+
+:root[data-theme="md3"] .pagination-page.is-active::after,
+:root[data-theme="md3"] .task-filter__btn.is-active::after {
+    opacity: 0;
+    height: 100%;
+}
+
+/* 筛选图标小钮 */
+:root[data-theme="md3"] .ena-btn--icon.filter-icon-btn.is-active {
+    background: var(--md3-secondary-container);
+    color: var(--md3-on-secondary-container);
+}
+
+/* ---- 模态：28px + emphasized 编排 ---- */
+:root[data-theme="md3"] .ena-modal__overlay {
+    transition: opacity .28s var(--ease-standard);
+}
+
 :root[data-theme="md3"] .ena-modal__panel {
-    box-shadow: 0 8px 32px var(--shadow-color);
+    border-radius: 28px;
+    background: var(--bg-menu);
+    box-shadow: var(--md3-shadow-3);
+    transform: scale(.94);
+    opacity: 0;
+    transition: clip-path .28s var(--ease-emphasized), transform .28s var(--ease-decelerate), opacity .2s linear;
 }
 
-:root[data-theme="md3"] .ena-modal__header {
-    border-radius: var(--radius-modal) var(--radius-modal) 0 0;
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel {
+    transform: scale(1);
+    opacity: 1;
 }
 
+:root[data-theme="md3"] .ena-modal__header,
 :root[data-theme="md3"] .ena-modal__footer {
-    border-radius: 0 0 var(--radius-modal) var(--radius-modal);
-}
-
-/* ---- 详情头：底圆角横幅 ---- */
-:root[data-theme="md3"] .detail-header__cover {
-    border-radius: var(--radius-cover, 8px);
-}
-
-:root[data-theme="md3"] .detail-header {
-    border-radius: 0 0 var(--radius-header, 16px) var(--radius-header, 16px);
-}
-
-/* ---- 搜索栏：药丸容器，内件无底线 ---- */
-:root[data-theme="md3"] .search-wrap {
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-:root[data-theme="md3"] .search-wrap .ena-dropdown,
-:root[data-theme="md3"] .search-wrap .ena-dropdown__trigger,
-:root[data-theme="md3"] .search-wrap .ena-input-wrap,
-:root[data-theme="md3"] .search-wrap .ena-input,
-:root[data-theme="md3"] .search-wrap .ena-select {
-    border-radius: 0;
-    border-bottom: none;
-    background-color: transparent;
-}
-
-:root[data-theme="md3"] .search-wrap .ena-input:focus {
-    border-bottom-color: transparent;
-}
-
-:root[data-theme="md3"] .search-wrap > .ena-btn {
-    border-radius: 0;
-    border-bottom: none;
     background: transparent;
+}
+
+:root[data-theme="md3"] .ena-modal__title {
+    font-weight: 500;
+    letter-spacing: .5px;
+    color: var(--text-primary);
+}
+
+:root[data-theme="md3"] .ena-modal__body {
     color: var(--text-secondary);
 }
 
-:root[data-theme="md3"] .search-wrap > .ena-btn::before {
-    border-radius: 0;
-    background: var(--md3-primary-hover);
-}
-
-:root[data-theme="md3"] .search-wrap > .ena-btn:hover {
-    color: var(--fill);
-}
-
-@media (max-width: 900px) {
-    :root[data-theme="md3"] .search-wrap > .ena-btn {
-        border-radius: 999px;
-    }
-
-    :root[data-theme="md3"] .search-wrap > .ena-btn::before {
-        border-radius: 999px;
-    }
-}
-
-/* ---- 播放页全屏：无圆角 ---- */
-:root[data-theme="md3"] .playback-overlay,
-:root[data-theme="md3"] .playback-overlay__bg,
-:root[data-theme="md3"] .playback-overlay__glow,
-:root[data-theme="md3"] .playback-overlay__scrim,
-:root[data-theme="md3"] .playback-overlay__top,
-:root[data-theme="md3"] .playback-overlay__inner,
-:root[data-theme="md3"] .playback-overlay__left,
-:root[data-theme="md3"] .playback-overlay__right,
-:root[data-theme="md3"] .playback-panel,
-:root[data-theme="md3"] .playback-panel--song,
-:root[data-theme="md3"] .playback-panel--mv,
-:root[data-theme="md3"] .playback-cover,
-:root[data-theme="md3"] .playback-cover img,
-:root[data-theme="md3"] .playback-cover svg,
-:root[data-theme="md3"] .playback-slider,
-:root[data-theme="md3"] .mv-video,
-:root[data-theme="md3"] .mv-loading,
-:root[data-theme="md3"] .mv-play-indicator,
-:root[data-theme="md3"] .playback-mobile-bottom,
-:root[data-theme="md3"] .playback-lyric,
-:root[data-theme="md3"] .playback-lyric__scroller,
-:root[data-theme="md3"] .playback-lyric__lines {
-    border-radius: 0;
-}
-
-/* ---- 队列面板：左圆角 ---- */
-:root[data-theme="md3"] .queue-panel__panel {
-    border-radius: var(--radius-panel) 0 0 var(--radius-panel);
-}
-
-:root[data-theme="md3"] .queue-panel__header {
-    border-radius: var(--radius-panel) 0 0 0;
-}
-
-/* ---- 进度条：全药丸 ---- */
-:root[data-theme="md3"] .player-progress,
-:root[data-theme="md3"] .player-progress-bar,
-:root[data-theme="md3"] .ena-progress,
-:root[data-theme="md3"] .ena-progress__bar,
-:root[data-theme="md3"] .task-track__progress,
-:root[data-theme="md3"] .task-track__progress-bar,
-:root[data-theme="md3"] .side-tree-progress,
-:root[data-theme="md3"] .side-tree-progress__bar,
-:root[data-theme="md3"] .wiki-progress__bar,
-:root[data-theme="md3"] .wiki-progress__bar-inner,
-:root[data-theme="md3"] .wiki-progress-bar,
-:root[data-theme="md3"] .wiki-progress-bar-inner,
-:root[data-theme="md3"] .playback-mobile-progress,
-:root[data-theme="md3"] .playback-mobile-progress-bar {
+:root[data-theme="md3"] .ena-modal__close {
     border-radius: 999px;
 }
 
-/* ---- 滚动条与浮层 ---- */
+:root[data-theme="md3"] .ena-modal__close::before {
+    transform: scale(0);
+    transform-origin: center;
+    background: var(--md3-primary);
+    opacity: 0;
+    transition: transform .15s var(--ease-standard), opacity .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-modal__close:hover::before {
+    transform: scale(1);
+    opacity: .1;
+}
+
+:root[data-theme="md3"] .ena-modal__close:hover {
+    color: var(--md3-primary);
+}
+
+/* ---- Toast：inverse-surface 药丸 ---- */
+:root[data-theme="md3"] .ena-toast {
+    border-radius: 4px;
+}
+
+:root[data-theme="md3"] .ena-toast__body {
+    border-radius: 4px;
+    background: var(--md3-inverse-surface);
+    color: var(--md3-inverse-on-surface);
+    box-shadow: var(--md3-shadow-3);
+    font-weight: 500;
+}
+
+:root[data-theme="md3"] .ena-toast__line {
+    background: color-mix(in srgb, var(--md3-inverse-on-surface) 55%, transparent);
+}
+
+/* ---- Tooltip：inverse 药丸 ---- */
+:root[data-theme="md3"] .app-tooltip {
+    border-radius: 4px;
+    background: var(--md3-inverse-surface);
+    color: var(--md3-inverse-on-surface);
+    box-shadow: var(--md3-shadow-2);
+    font-weight: 500;
+    transition: clip-path .16s var(--ease-standard), transform .22s var(--ease-decelerate);
+}
+
+/* ---- 搜索页签：居中短药丸指示条 ---- */
+:root[data-theme="md3"] .search-tab {
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color .2s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .search-tab::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--md3-primary);
+    transition: width .3s var(--ease-emphasized);
+}
+
+:root[data-theme="md3"] .search-tab:hover {
+    color: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .search-tab.is-active {
+    color: var(--md3-primary);
+}
+
+:root[data-theme="md3"] .search-tab.is-active::before {
+    width: 34px;
+}
+
+/* ---- 播放条 / 进度 ---- */
+:root[data-theme="md3"] .player-bar {
+    transition: clip-path .35s var(--ease-emphasized);
+}
+
+:root[data-theme="md3"] .player-cover {
+    border-radius: 8px;
+}
+
+:root[data-theme="md3"] .player-progress {
+    border-radius: 999px;
+    transition: background-color .2s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .player-progress-bar {
+    border-radius: 999px;
+}
+
+:root[data-theme="md3"] .player-progress__tip {
+    border-radius: 4px;
+    background: var(--md3-inverse-surface);
+    color: var(--md3-inverse-on-surface);
+    box-shadow: var(--md3-shadow-2);
+    font-weight: 500;
+    transition: clip-path .25s var(--ease-emphasized);
+}
+
+/* 音量弹层：菜单药丸 + emphasized */
+:root[data-theme="md3"] .volume-popup {
+    border-radius: 12px;
+    box-shadow: var(--md3-shadow-2);
+    transition: clip-path .28s var(--ease-decelerate);
+}
+
+/* 播放条内歌词：主色当前行 */
+:root[data-theme="md3"] .player-lyric__line.is-current {
+    color: var(--md3-primary);
+}
+
+/* ---- 大屏歌词（播放页） ---- */
+:root[data-theme="md3"] .playback-lyric__line {
+    transition: opacity .25s var(--ease-standard), color .3s var(--ease-emphasized), transform .3s var(--ease-emphasized);
+}
+
+:root[data-theme="md3"] .playback-lyric__line::before {
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--md3-primary) 7%, transparent);
+}
+
+:root[data-theme="md3"] .playback-lyric__line.is-current {
+    opacity: 1;
+    color: var(--md3-primary);
+    transform: scale(1.04);
+    font-weight: 500;
+}
+
+/* ---- 滚动条：药丸 ---- */
+:root[data-theme="md3"] ::-webkit-scrollbar {
+    width: 8px;
+}
+
 :root[data-theme="md3"] ::-webkit-scrollbar-thumb {
     border-radius: 999px;
 }
 
-:root[data-theme="md3"] .ena-toast__line {
-    border-radius: 0 2px 2px 0;
+/* ---- 主题卡片：激活 secondary-container ---- */
+:root[data-theme="md3"] .theme-card__name,
+:root[data-theme="md3"] .theme-card__author {
+    color: var(--text-secondary);
 }
 
-:root[data-theme="md3"] .app-tooltip {
-    border-radius: 4px;
+:root[data-theme="md3"] .theme-card__name {
+    font-weight: 500;
+    color: var(--text-primary);
 }
 
-:root[data-theme="md3"] .wiki-progress-panel {
-    border-radius: 16px;
+:root[data-theme="md3"] .theme-card__author {
+    color: var(--text-tertiary);
 }
 
-:root[data-theme="md3"] .wiki-progress-cancel {
-    border-radius: 999px;
-}
-
-:root[data-theme="md3"] .list-drag-ghost,
-:root[data-theme="md3"] .list-drag-placeholder {
-    border-radius: 8px;
-}
-
-/* ---- 头像：圆形 ---- */
-:root[data-theme="md3"] .artist-card__cover,
-:root[data-theme="md3"] .artist-detail__cover,
-:root[data-theme="md3"] .user-card__avatar,
-:root[data-theme="md3"] .account-btn__avatar,
-:root[data-theme="md3"] .account-modal__candidate-avatar {
-    border-radius: 50%;
-}
-
-/* ---- 链接无圆角 ---- */
-:root[data-theme="md3"] .about-modal a,
-:root[data-theme="md3"] .setting-repo-link,
-:root[data-theme="md3"] .entity-link,
-:root[data-theme="md3"] a {
-    border-radius: 0;
-}
-
-/* ---- 主题卡片：状态层悬停，激活为 secondary-container 药丸 ---- */
 :root[data-theme="md3"] .theme-card::before {
-    background: var(--md3-primary-hover);
+    height: 100%;
+    background: var(--md3-primary);
+    opacity: 0;
+    transition: opacity .2s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .theme-card:hover::before {
+    height: 100%;
+    opacity: .06;
+}
+
+:root[data-theme="md3"] .theme-card.is-active {
+    background-color: var(--md3-secondary-container);
 }
 
 :root[data-theme="md3"] .theme-card.is-active::before {
-    background: var(--md3-secondary-container);
+    height: 100%;
+    opacity: 0;
 }
 
-:root[data-theme="md3"] .theme-card.is-active .theme-card__name,
-:root[data-theme="md3"] .theme-card.is-active .theme-card__author,
-:root[data-theme="md3"] .theme-card.is-active:hover .theme-card__name,
-:root[data-theme="md3"] .theme-card.is-active:hover .theme-card__author {
+:root[data-theme="md3"] .theme-card.is-active .theme-card__name {
     color: var(--md3-on-secondary-container);
+}
+
+:root[data-theme="md3"] .theme-card.is-active .theme-card__author {
+    color: color-mix(in srgb, var(--md3-on-secondary-container) 75%, transparent);
+}
+
+:root[data-theme="md3"] .theme-card:hover .theme-card__name {
+    color: var(--text-primary);
+}
+
+:root[data-theme="md3"] .theme-card:hover .theme-card__author {
+    color: var(--text-secondary);
+}
+
+/* ==================== 移动端（900px 内） ==================== */
+@media (max-width: 900px) {
+    /* 底部导航：MD3 navigation bar pill indicator */
+    :root[data-theme="md3"] .side-nav a::before {
+        top: 5px;
+        bottom: auto;
+        left: 50%;
+        width: 0;
+        height: 26px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--md3-primary) 18%, transparent);
+        opacity: 1;
+        transform: translateX(-50%);
+        transition: width .3s var(--ease-emphasized), background-color .2s var(--ease-standard);
+    }
+
+    :root[data-theme="md3"] .side-nav a:hover::before {
+        width: 44px;
+        height: 26px;
+        background: color-mix(in srgb, var(--md3-primary) 10%, transparent);
+    }
+
+    :root[data-theme="md3"] .side-nav a.is-active::before {
+        width: 44px;
+        height: 26px;
+        background: color-mix(in srgb, var(--md3-primary) 18%, transparent);
+    }
+
+    :root[data-theme="md3"] .side-nav a.is-active {
+        color: var(--md3-on-primary-container);
+    }
+
+    :root[data-theme="md3"] .side-nav a:hover {
+        color: var(--md3-on-primary-container);
+    }
 }
