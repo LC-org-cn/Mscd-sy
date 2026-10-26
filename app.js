@@ -2363,7 +2363,7 @@ function syncPlayingRows() {
     });
 }
 
-function mountView(viewName) {
+function mountViewNow(viewName) {
     if (currentViewInstance) {
         currentViewInstance.destroy?.();
         currentViewInstance = null;
@@ -2404,6 +2404,16 @@ function mountView(viewName) {
         contentEl.appendChild(instance.node);
         currentViewInstance = instance;
         syncPlayingRows();
+    }
+}
+
+function mountView(viewName) {
+    const root = document.documentElement;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && root.dataset.theme === 'md3' && !reduced) {
+        document.startViewTransition(() => mountViewNow(viewName));
+    } else {
+        mountViewNow(viewName);
     }
 }
 

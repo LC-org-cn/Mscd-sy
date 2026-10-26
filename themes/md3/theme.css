@@ -1077,15 +1077,8 @@
     to { opacity: 1; }
 }
 
-:root[data-theme="md3"] .search-view,
-:root[data-theme="md3"] .queue-view,
-:root[data-theme="md3"] .downloads-view,
-:root[data-theme="md3"] .status-view,
-:root[data-theme="md3"] .settings-view,
-:root[data-theme="md3"] .myfavorites-view,
-:root[data-theme="md3"] .liked-view {
-    animation: md3-view-in var(--md3-dur-medium, 300ms) var(--ease-decelerate) both;
-}
+/* 视图入场已由 v5 的 View Transitions 接管；
+   不支持 VT 的浏览器走文件末尾 @supports not 降级块 */
 
 /* ---- 详情页头部：hero 封面入场（decelerate + 轻缩放） ---- */
 @keyframes md3-hero-in {
@@ -1481,4 +1474,223 @@
         transform: none;
         opacity: 1;
     }
+}
+
+
+/* ==================== v5：View Transitions 滑动编排 + 按钮圆润 + 移动端专项 ==================== */
+
+/* ---- 1) 视图切换：shared-axis X 滑动（View Transitions API） ---- */
+:root[data-theme="md3"] .content-area {
+    view-transition-name: md3-content;
+}
+
+@keyframes md3-vt-exit {
+    to { transform: translateX(-56px); opacity: 0; }
+}
+
+@keyframes md3-vt-enter {
+    from { transform: translateX(56px); opacity: 0; }
+}
+
+html[data-theme="md3"]::view-transition-old(md3-content) {
+    animation: md3-vt-exit .18s var(--ease-accelerate) both;
+}
+
+html[data-theme="md3"]::view-transition-new(md3-content) {
+    animation: md3-vt-enter .32s var(--ease-decelerate) both;
+}
+
+html[data-theme="md3"]::view-transition-group(md3-content) {
+    animation-duration: .5s;
+    animation-timing-function: var(--ease-standard);
+}
+
+/* 无 View Transitions 支持的浏览器：退回 CSS 入场动画（v3 的 view-in 保留于此） */
+@supports not (view-transition-name: none) {
+    :root[data-theme="md3"] .search-view,
+    :root[data-theme="md3"] .queue-view,
+    :root[data-theme="md3"] .downloads-view,
+    :root[data-theme="md3"] .status-view,
+    :root[data-theme="md3"] .settings-view,
+    :root[data-theme="md3"] .myfavorites-view,
+    :root[data-theme="md3"] .liked-view {
+        animation: md3-view-in var(--md3-dur-medium, 300ms) var(--ease-decelerate) both;
+    }
+}
+
+/* ---- 2) 按钮圆润按压：squish 弹性变形（MD3 expressive） ---- */
+@keyframes md3-squish {
+    0% { transform: scale(1, 1); }
+    30% { transform: scale(1.04, .92); }
+    60% { transform: scale(.98, 1.03); }
+    100% { transform: scale(1, 1); }
+}
+
+@keyframes md3-squish-round {
+    0% { border-radius: 999px; }
+    30% { border-radius: 46% 46% 46% 46% / 60% 60% 40% 40%; }
+    60% { border-radius: 999px; }
+    100% { border-radius: 999px; }
+}
+
+:root[data-theme="md3"] .ena-btn {
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-theme="md3"] .ena-btn:active {
+    animation: md3-squish .34s var(--ease-spring);
+}
+
+/* primary 按钮：hover 浮起 + 阴影层级提升（MD3 filled tonal elevation） */
+:root[data-theme="md3"] .ena-btn--primary:not(.ena-btn--icon) {
+    transition:
+        background-color .45s var(--ease-standard),
+        color .15s var(--ease-standard),
+        transform .18s var(--ease-spring),
+        box-shadow .25s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-btn--primary:not(.ena-btn--icon):hover {
+    box-shadow: var(--md3-shadow-2);
+    transform: translateY(-1px);
+}
+
+:root[data-theme="md3"] .ena-btn--primary:not(.ena-btn--icon):active {
+    box-shadow: var(--md3-shadow-1, 0 1px 2px rgba(0, 0, 0, 0.1));
+    transform: translateY(0);
+}
+
+/* 图标按钮按压：圆角呼吸变形 */
+:root[data-theme="md3"] .ena-btn--icon:active {
+    animation: md3-squish-round .3s var(--ease-spring);
+}
+
+/* 涟漪改为按压触发（接触瞬间扩散），hover 保留状态层 */
+:root[data-theme="md3"] .ena-btn:active::after,
+:root[data-theme="md3"] .theme-card:active::after,
+:root[data-theme="md3"] .song-menu-item:active::after,
+:root[data-theme="md3"] .account-menu__item:active::after,
+:root[data-theme="md3"] .ena-dropdown__item:active::after,
+:root[data-theme="md3"] .side-nav a:active::after {
+    animation: md3-ripple .5s var(--ease-standard);
+    animation-fill-mode: forwards;
+}
+
+/* ---- 3) 移动端专项（≤900px） ---- */
+@media (max-width: 900px) {
+    /* 模态 → bottom sheet：贴底、上圆角、底部滑入编排 */
+    :root[data-theme="md3"] .ena-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    :root[data-theme="md3"] .ena-modal__panel {
+        border-radius: 28px 28px 0 0;
+        max-width: 100%;
+        max-height: 86vh;
+        width: 100%;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.18);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        transform: translateY(100%);
+        transition: transform .34s var(--ease-decelerate), opacity .18s linear;
+    }
+
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel {
+        transform: translateY(0);
+        animation: none;
+    }
+
+    :root[data-theme="md3"] .ena-modal__header {
+        position: relative;
+        padding-top: 20px;
+    }
+
+    /* bottom sheet 拖拽把手装饰 */
+    :root[data-theme="md3"] .ena-modal__header::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--border-strong);
+        opacity: .5;
+    }
+
+    /* 触控目标强化：图标按钮不小于 44px */
+    :root[data-theme="md3"] .ena-btn--icon {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* 触屏去滚动条 */
+    :root[data-theme="md3"] ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+
+    /* 播放键按压增强 */
+    :root[data-theme="md3"] .player-play:active {
+        transform: scale(.88);
+    }
+
+    /* 菜单与音量弹层：移动端小圆角贴边 */
+    :root[data-theme="md3"] .ena-dropdown__menu,
+    :root[data-theme="md3"] .volume-popup {
+        border-radius: 16px;
+    }
+
+    /* 移动 VT：改为 Y 轴 shared axis（纵向滑动更符合手持导航） */
+    :root[data-theme="md3"] .content-area {
+        view-transition-name: none;
+    }
+
+    /* 搜索药丸在窄屏占满 */
+    :root[data-theme="md3"] .search-wrap {
+        flex: 1 1 auto;
+        width: auto;
+    }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+    html[data-theme="md3"]::view-transition-old(root) {
+        animation: md3-vt-exit-y .16s var(--ease-accelerate) both;
+    }
+
+    html[data-theme="md3"]::view-transition-new(root) {
+        animation: md3-vt-enter-y .3s var(--ease-decelerate) both;
+    }
+}
+
+@keyframes md3-vt-exit-y {
+    to { transform: translateY(-32px); opacity: 0; }
+}
+
+@keyframes md3-vt-enter-y {
+    from { transform: translateY(32px); opacity: 0; }
+}
+
+/* ---- 4) 滚动体验：平滑锚点 + 过度滚动抑制 ---- */
+:root[data-theme="md3"] html {
+    scroll-behavior: smooth;
+}
+
+:root[data-theme="md3"] .content-area {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ---- 5) 输入聚焦 spring 底线（v4 补强：宽度生长动画） ---- */
+@keyframes md3-underline-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+:root[data-theme="md3"] .ena-input:focus,
+:root[data-theme="md3"] .ena-select:focus {
+    box-shadow: none;
+    border-bottom: 2px solid var(--md3-primary);
+    animation: none;
 }
