@@ -2355,3 +2355,206 @@ html[data-theme="md3"]::view-transition-group(md3-content) {
         animation: none;
     }
 }
+
+
+/* ==================== v9：容器约束适配（修复大小不对） ==================== */
+
+/* ---- 播放键：贴 bar 高 52px（MD3 圆形 FAB 精神保留） ---- */
+:root[data-theme="md3"] .player-bar .player-play {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    margin: 0 -6px;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .player-bar .player-play svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 播放条内图标按钮：贴 32px 基础（bar 高 52px 约束），MD3 圆形保留 */
+:root[data-theme="md3"] .player-bar .player-controls .ena-btn--icon,
+:root[data-theme="md3"] .player-bar .player-right .ena-btn--icon,
+:root[data-theme="md3"] .top-bar .ena-btn--icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .player-bar .player-controls .ena-btn--icon svg,
+:root[data-theme="md3"] .player-bar .player-right .ena-btn--icon svg,
+:root[data-theme="md3"] .top-bar .ena-btn--icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ---- 顶栏搜索框：贴 36px（44px 顶栏约束，MD3 filled 线条风格保留） ---- */
+:root[data-theme="md3"] .search-wrap .ena-input,
+:root[data-theme="md3"] .search-wrap .ena-select {
+    height: 36px;
+    min-height: 36px;
+    border-radius: 9999px;
+}
+
+/* 药丸形搜索输入（MD3 search bar 规范在 44px 约束内的近似） */
+:root[data-theme="md3"] .search-wrap .ena-input-wrap {
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .search-wrap .ena-input {
+    background: color-mix(in srgb, var(--md3-surface-container-high) 100%, transparent);
+    padding-right: 14px;
+    box-shadow: none;
+}
+
+:root[data-theme="md3"] .search-wrap .ena-input:focus {
+    background: color-mix(in srgb, var(--md3-surface-container-highest) 100%, transparent);
+    border-bottom: none;
+    box-shadow: none;
+}
+
+:root[data-theme="md3"] .search-wrap > .ena-btn {
+    height: 36px;
+    min-height: 36px;
+    padding-inline: 16px;
+}
+
+/* ---- 表单区输入（非搜索上下文）：保持 filled 56px ---- */
+/* 已由 v6/v7 定义——此处仅声明上下文限定语义 */
+
+/* ---- 移动端播放键：贴 48px bar ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .player-bar .player-play {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        margin: 0;
+    }
+
+    :root[data-theme="md3"] .player-bar .player-play svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    /* 移动端顶栏更紧凑 44px：搜索输入 34px */
+    :root[data-theme="md3"] .search-wrap .ena-input,
+    :root[data-theme="md3"] .search-wrap .ena-select {
+        height: 34px;
+        min-height: 34px;
+    }
+
+    :root[data-theme="md3"] .search-wrap > .ena-btn {
+        height: 34px;
+        min-height: 34px;
+    }
+}
+
+/* ---- 滑杆 thumb 对位修复：track 4px 时 thumb 垂直居中 ---- */
+:root[data-theme="md3"] .ena-range::-webkit-slider-runnable-track {
+    height: 4px;
+    margin-top: calc((20px - 4px) / 2 * -1 + 0px);
+}
+
+:root[data-theme="md3"] .ena-range::-webkit-slider-thumb {
+    margin-top: -8px;
+}
+
+/* 音量弹层滑杆：贴弹层布局（基础 4px 高轨道居中） */
+:root[data-theme="md3"] .volume-popup .ena-range {
+    height: 20px;
+}
+
+/* ---- 触控目标 44px 仅限内容区宽列表（避免挤爆紧凑容器） ---- */
+:root[data-theme="md3"] .content-area .ena-btn--icon {
+    min-width: 40px;
+    min-height: 40px;
+}
+
+/* ---- 移动端 nav 指示器对位修复：bottom 布局转药丸 ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .side-nav a.is-active::before {
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%) translateX(-50%);
+        left: 50%;
+        width: 56px;
+        height: 32px;
+        border-radius: 9999px;
+        opacity: 1;
+    }
+
+    :root[data-theme="md3"] .side-nav a.is-active svg {
+        color: var(--md3-on-secondary-container);
+        position: relative;
+        z-index: 1;
+    }
+
+    :root[data-theme="md3"] .side-nav a.is-active span {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+/* ---- 侧栏树节点：恢复 MD3 圆角但贴既有行高 ---- */
+:root[data-theme="md3"] .side-tree-node {
+    border-radius: 9999px;
+}
+
+/* ---- 菜单贴边修正：menu 16px 但屏幕边 8px 安全距 ---- */
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .player-more-menu,
+:root[data-theme="md3"] .mobile-more-menu,
+:root[data-theme="md3"] .mv-quality-menu,
+:root[data-theme="md3"] .multi-select-menu,
+:root[data-theme="md3"] .view-switcher-menu {
+    border-radius: 16px;
+    padding: 4px;
+}
+
+/* 菜单项 4px + hover 状态层 */
+:root[data-theme="md3"] .song-menu-item,
+:root[data-theme="md3"] .player-more-item,
+:root[data-theme="md3"] .mobile-more-item,
+:root[data-theme="md3"] .mv-quality-item,
+:root[data-theme="md3"] .multi-select-menu-item,
+:root[data-theme="md3"] .view-switcher-item {
+    border-radius: 4px;
+    transition: background-color 150ms var(--ease-standard), color 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .song-menu-item:hover,
+:root[data-theme="md3"] .player-more-item:hover,
+:root[data-theme="md3"] .mobile-more-item:hover,
+:root[data-theme="md3"] .multi-select-menu-item:hover,
+:root[data-theme="md3"] .view-switcher-item:hover {
+    background: color-mix(in srgb, var(--md3-on-surface) 8%, transparent);
+}
+
+/* ---- 选中菜单项 12px ---- */
+:root[data-theme="md3"] .view-switcher-item.is-active,
+:root[data-theme="md3"] .mv-quality-item.is-active,
+:root[data-theme="md3"] .multi-select-menu-item.is-active {
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--md3-secondary-container) 100%, transparent);
+    color: var(--md3-on-secondary-container);
+}
+
+/* ---- Toast 位置约束：保持遮让播放条 ---- */
+:root[data-theme="md3"] .ena-toast-wrap {
+    bottom: calc(var(--player-bar-height, 52px) + 16px);
+}
+
+/* ---- reduced-motion 補丁 ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .song-menu-item,
+    :root[data-theme="md3"] .player-more-item,
+    :root[data-theme="md3"] .view-switcher-item,
+    :root[data-theme="md3"] .multi-select-menu-item {
+        transition: none;
+    }
+}
