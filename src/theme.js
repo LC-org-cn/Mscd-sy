@@ -201,6 +201,138 @@ export function generateThemeVars(themeHex, mode = 'auto') {
     };
 }
 
+/*
+ * Material Design 3 动态取色：以用户选择的种子色按 MD3 tonal 规则
+ * 派生 primary / container / surface 全套变量（HSL 近似 tonal palette）。
+ * 由 theme-manager 在 manifest accent.engine === 'md3' 时调用。
+ */
+export function generateMd3Vars(themeHex, mode = 'auto') {
+    const { h, s } = hexToHsl(themeHex);
+    const resolved = resolveMode(mode);
+    const isLight = resolved === 'light';
+
+    // 色度钳制：保留种子色特征，同时落在 MD3 视觉边界内
+    // （地板值取低：MD3 对中性种子的 tonal palette 色度本就很低）
+    const cP = Math.min(0.85, Math.max(0.08, s));         // primary 色度
+    const cC = Math.min(0.60, Math.max(0.04, s * 0.45));  // container 色度
+    const cN = Math.min(0.14, Math.max(0.008, s * 0.18)); // neutral 表面色度
+
+    if (isLight) {
+        const primary = hslToHex(h, cP, 0.40);
+        return {
+            '--md3-primary': primary,
+            '--md3-on-primary': pickOnColor(primary),
+            '--md3-primary-container': hslToHex(h, cC, 0.89),
+            '--md3-on-primary-container': hslToHex(h, cC, 0.14),
+            '--md3-secondary-container': hslToHex(h, cN, 0.88),
+            '--md3-on-secondary-container': hslToHex(h, cN, 0.12),
+            '--md3-error-container': '#f9dedc',
+            '--md3-on-error-container': '#410e0b',
+            '--md3-inverse-surface': hslToHex(h, cN, 0.20),
+            '--md3-inverse-on-surface': hslToHex(h, cN, 0.95),
+            '--md3-primary-hover': hsla(h, cP, 0.40, 0.10),
+
+            '--fill': primary,
+            '--border-line': primary,
+            '--hover-text': primary,
+            '--on-accent': pickOnColor(primary),
+            '--on-accent-muted': 'rgba(255, 255, 255, 0.70)',
+            '--on-accent-faint': 'rgba(255, 255, 255, 0.62)',
+            '--fill-light': hsla(h, cP, 0.40, 0.10),
+            '--selection-box-bg': hsla(h, cP, 0.40, 0.12),
+
+            '--bg-page': hslToHex(h, cN, 0.985),
+            '--bg-top': hslToHex(h, cN, 0.955),
+            '--bg-side': hslToHex(h, cN, 0.965),
+            '--bg-player': hslToHex(h, cN, 0.955),
+            '--bg-input': hslToHex(h, cN, 0.90),
+            '--bg-menu': hslToHex(h, cN, 0.925),
+            '--bg-float': hslToHex(h, cN, 0.925),
+            '--bg-overlay': hsla(h, cN, 0.925, 0.95),
+            '--bg-surface': hslToHex(h, cN, 0.965),
+            '--bg-surface-hover': hslToHex(h, cN, 0.945),
+            '--bg-subtle': hsla(h, cN, 0.10, 0.04),
+            '--bg-cover': hslToHex(h, cN, 0.90),
+            '--bg-wipe': hslToHex(h, cN, 0.925),
+            '--text-primary': hslToHex(h, cN, 0.10),
+            '--text-secondary': hslToHex(h, cN, 0.28),
+            '--text-tertiary': hslToHex(h, cN, 0.46),
+            '--border': hslToHex(h, cN, 0.78),
+            '--border-strong': hslToHex(h, cN, 0.46),
+            '--border-faint': hsla(h, cN, 0.78, 0.5),
+            '--hover-bg': hsla(h, cN, 0.10, 0.08),
+            '--progress-track': hsla(h, cN, 0.10, 0.10),
+            '--progress-track-hover': hsla(h, cN, 0.10, 0.16),
+            '--range-track': hsla(h, cN, 0.10, 0.12),
+            '--overlay-detail': hsla(h, cN, 0.985, 0.72),
+            '--waveform': hslToHex(h, cN, 0.10),
+            '--scrollbar-thumb': hslToHex(h, cN, 0.78),
+            '--scrollbar-thumb-hover': hslToHex(h, cN, 0.46),
+            '--scrim': 'rgba(0, 0, 0, 0.4)',
+            '--shadow-color': 'rgba(0, 0, 0, 0.15)',
+            '--tree-bg-2': hsla(h, cN, 0.10, 0.03),
+            '--tree-bg-3': hsla(h, cN, 0.10, 0.06),
+        };
+    }
+
+    const primary = hslToHex(h, cP, 0.80);
+    const onPrimary = hslToHex(h, Math.max(cP * 0.7, 0.15), 0.22);
+    return {
+        '--md3-primary': primary,
+        '--md3-on-primary': onPrimary,
+        '--md3-primary-container': hslToHex(h, cP, 0.32),
+        '--md3-on-primary-container': hslToHex(h, cC, 0.90),
+        '--md3-secondary-container': hslToHex(h, cN, 0.28),
+        '--md3-on-secondary-container': hslToHex(h, cN, 0.88),
+        '--md3-error-container': '#8c1d18',
+        '--md3-on-error-container': '#f9dedc',
+        '--md3-inverse-surface': hslToHex(h, cN, 0.90),
+        '--md3-inverse-on-surface': hslToHex(h, cN, 0.15),
+        '--md3-primary-hover': hsla(h, cP, 0.80, 0.10),
+
+        '--fill': primary,
+        '--border-line': primary,
+        '--hover-text': primary,
+        '--on-accent': onPrimary,
+        '--on-accent-muted': hsla(h, cP, 0.22, 0.75),
+        '--on-accent-faint': hsla(h, cP, 0.22, 0.70),
+        '--fill-light': hsla(h, cP, 0.80, 0.10),
+        '--selection-box-bg': hsla(h, cP, 0.80, 0.16),
+
+        '--bg-page': hslToHex(h, cN, 0.07),
+        '--bg-top': hslToHex(h, cN, 0.13),
+        '--bg-side': hslToHex(h, cN, 0.10),
+        '--bg-player': hslToHex(h, cN, 0.13),
+        '--bg-input': hslToHex(h, cN, 0.21),
+        '--bg-menu': hslToHex(h, cN, 0.16),
+        '--bg-float': hslToHex(h, cN, 0.16),
+        '--bg-overlay': hsla(h, cN, 0.16, 0.95),
+        '--bg-surface': hslToHex(h, cN, 0.10),
+        '--bg-surface-hover': hslToHex(h, cN, 0.13),
+        '--bg-subtle': hsla(h, cN, 0.90, 0.05),
+        '--bg-cover': hslToHex(h, cN, 0.21),
+        '--bg-wipe': hslToHex(h, cN, 0.13),
+        '--text-primary': hslToHex(h, cN, 0.90),
+        '--text-secondary': hslToHex(h, cN, 0.78),
+        '--text-tertiary': hslToHex(h, cN, 0.58),
+        '--border': hslToHex(h, cN, 0.28),
+        '--border-strong': hslToHex(h, cN, 0.58),
+        '--border-faint': hsla(h, cN, 0.28, 0.6),
+        '--hover-bg': hsla(h, cN, 0.90, 0.08),
+        '--progress-track': hsla(h, cN, 0.90, 0.14),
+        '--progress-track-hover': hsla(h, cN, 0.90, 0.2),
+        '--range-track': hsla(h, cN, 0.90, 0.18),
+        '--overlay-detail': hsla(h, cN, 0.07, 0.8),
+        '--waveform': hslToHex(h, cN, 0.90),
+        '--scrollbar-thumb': hslToHex(h, cN, 0.28),
+        '--scrollbar-thumb-hover': hslToHex(h, cN, 0.45),
+        '--scrim': 'rgba(0, 0, 0, 0.6)',
+        '--shadow-color': 'rgba(0, 0, 0, 0.45)',
+        '--tree-bg-2': hsla(h, cN, 0.90, 0.04),
+        '--tree-bg-3': hsla(h, cN, 0.90, 0.08),
+    };
+}
+
 export function applyThemeVars(vars) {
     const root = document.documentElement;
     for (const [k, v] of Object.entries(vars)) {

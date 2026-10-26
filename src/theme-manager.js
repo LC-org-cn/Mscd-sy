@@ -1,5 +1,5 @@
 import { Toast } from './components.js';
-import { generateThemeVars } from './theme.js';
+import { generateThemeVars, generateMd3Vars } from './theme.js';
 
 const STORAGE_KEY = 'meting-app-state';
 
@@ -329,8 +329,9 @@ export class ThemeManager {
             el.textContent = '';
             return;
         }
-        const lightVars = generateThemeVars(color, 'light');
-        const darkVars = generateThemeVars(color, 'dark');
+        const engine = meta && meta.accent && meta.accent.engine === 'md3' ? generateMd3Vars : generateThemeVars;
+        const lightVars = engine(color, 'light');
+        const darkVars = engine(color, 'dark');
         if (!lightVars && !darkVars) {
             el.textContent = '';
             return;

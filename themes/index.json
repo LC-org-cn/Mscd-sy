@@ -31,6 +31,22 @@
         "default": "#2d2d2d",
         "derivable": true
       }
+    },
+    {
+      "id": "md3",
+      "name": "Material Design 3",
+      "author": "MSCD 内置",
+      "version": "1.0.0",
+      "css": "md3/theme.css",
+      "modes": [
+        "light",
+        "dark"
+      ],
+      "accent": {
+        "default": "#6750a4",
+        "derivable": true,
+        "engine": "md3"
+      }
     }
   ]
 }
