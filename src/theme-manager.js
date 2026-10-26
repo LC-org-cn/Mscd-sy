@@ -262,6 +262,7 @@ export class ThemeManager {
                     link.id = 'theme-stylesheet';
                     this.currentThemeId = id;
                     this.applyDom(id, '', this.currentMode);
+                    this.applyThemeScript(meta);
                     this.applyAccent(this.store.get().settings.themeColor);
                     this.emit();
                     resolve(true);
@@ -276,6 +277,17 @@ export class ThemeManager {
             link.onerror = () => finish(false);
             document.head.appendChild(link);
         });
+    }
+
+    applyThemeScript(meta) {
+        const old = document.getElementById('theme-script');
+        if (old && old.parentNode) old.parentNode.removeChild(old);
+        if (!meta || !meta.js) return;
+        const s = document.createElement('script');
+        s.id = 'theme-script';
+        s.type = 'module';
+        s.src = 'themes/' + meta.js + '?v=' + Date.now();
+        document.head.appendChild(s);
     }
 
     applyDom(themeId, _mode, resolvedMode) {

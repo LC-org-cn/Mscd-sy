@@ -1694,3 +1694,247 @@ html[data-theme="md3"]::view-transition-group(md3-content) {
     border-bottom: 2px solid var(--md3-primary);
     animation: none;
 }
+
+
+/* ==================== v6：material-esm 规范对齐 ==================== */
+
+/* ---- EASING：material-esm internal/motion/animation.js 全套六曲线 ---- */
+:root[data-theme="md3"] {
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+    --ease-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+    --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+    --ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+    --ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+    --md-ripple-press-grow: 450ms;
+    --md-ripple-fade-out: 375ms;
+    --md-ripple-touch-delay: 150ms;
+}
+
+/* ---- 涟漪实例（theme.js 注入的 span）---- */
+:root[data-theme="md3"] .md3-ripple-instance {
+    animation: none; /* WAAPI 驱动，无需 CSS animation */
+}
+
+/* ---- 按钮：material-esm buttons/button.js 精确规范 ---- */
+/* 容器 40px 高、全药丸 9999px、label 0.875rem/500、gap 8px、leading/trailing 16px */
+/* height 用 min-height 保障触达规范，保留既有弹性场景（如多行/紧凑容器） */
+:root[data-theme="md3"] .ena-btn {
+    min-height: 40px;
+    border-radius: 9999px;
+    gap: 8px;
+    padding-inline: 16px;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    letter-spacing: 0.1px;
+}
+
+:root[data-theme="md3"] .ena-btn--sm {
+    height: 32px;
+    min-height: 32px;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+    padding-inline: 12px;
+}
+
+:root[data-theme="md3"] .ena-btn--icon {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .ena-btn--icon.ena-btn--sm {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    min-height: 32px;
+}
+
+/* icon 20px（material-esm --_icon-size 默认） */
+:root[data-theme="md3"] .ena-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* disabled：12% 容器 + 38% 内容（material-esm disabled 规范） */
+:root[data-theme="md3"] .ena-btn:disabled {
+    background: color-mix(in srgb, var(--md3-on-surface) 12%, transparent);
+    color: color-mix(in srgb, var(--md3-on-surface) 38%, transparent);
+    box-shadow: none;
+}
+
+/* ---- 菜单：container 16px + item 4px（material-esm menu.js） ---- */
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .account-menu,
+:root[data-theme="md3"] .ena-dropdown__menu {
+    border-radius: 16px;
+    padding: 4px;
+}
+
+:root[data-theme="md3"] .song-menu-item,
+:root[data-theme="md3"] .account-menu__item,
+:root[data-theme="md3"] .ena-dropdown__item {
+    border-radius: 4px;
+    margin: 0 0 2px;
+}
+
+/* ---- 选中态菜单项：12px medium 圆角（menu-item-selected-shape） ---- */
+:root[data-theme="md3"] .view-switcher-item.is-active,
+:root[data-theme="md3"] .ena-dropdown__item[aria-selected="true"] {
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--md3-secondary-container) 100%, transparent);
+}
+
+/* ---- 导航栏：active indicator 64x32 药丸（nav/bar.js） ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .side-nav a.is-active::before {
+        width: 64px;
+        height: 32px;
+        border-radius: 9999px;
+        top: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: color-mix(in srgb, var(--md3-secondary-container) 100%, transparent);
+    }
+    :root[data-theme="md3"] .side-nav a.is-active svg {
+        color: var(--md3-on-secondary-container);
+    }
+}
+
+/* ---- 滑杆：4px 轨道 + 20px 手柄（slider.js） ---- */
+:root[data-theme="md3"] .ena-range {
+    height: 20px;
+}
+
+:root[data-theme="md3"] .ena-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .ena-range::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    border: none;
+    margin-top: -8px;
+}
+
+:root[data-theme="md3"] .ena-range::-moz-range-track {
+    height: 4px;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .ena-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border: none;
+}
+
+/* ---- M3 Expressive：波形进度条（wavy progress） ---- */
+@keyframes md3-wavy-slide {
+    from { background-position-x: 0; }
+    to { background-position-x: -24px; }
+}
+
+:root[data-theme="md3"] .ena-progress__bar {
+    background-image: none;
+}
+
+:root[data-theme="md3"] .player-progress .player-progress-bar {
+    position: relative;
+    overflow: hidden;
+}
+
+/* 播放进度条激活段：8 段波形（M3 Expressive wavy） */
+:root[data-theme="md3"] .player-progress .player-progress-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: radial-gradient(circle at 6px 100%, var(--md3-primary) 5px, transparent 5.5px),
+        radial-gradient(circle at 18px 100%, var(--md3-primary) 5px, transparent 5.5px);
+    background-size: 24px 100%;
+    background-repeat: repeat-x;
+    animation: md3-wavy-slide 1.2s linear infinite;
+    opacity: 0;
+    transition: opacity .3s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .player-progress .player-progress-bar:hover::after,
+:root[data-theme="md3"] .player-progress.is-playing .player-progress-bar::after {
+    opacity: 1;
+}
+
+/* ---- Snackbar/Toast：material-esm snackbar 4px 圆角规范 ---- */
+:root[data-theme="md3"] .ena-toast__body {
+    border-radius: 4px;
+}
+
+/* ---- Chips：material-esm chips 8px 圆角 + outline 8px ---- */
+:root[data-theme="md3"] .task-filter__btn,
+:root[data-theme="md3"] .pagination-page {
+    border-radius: 8px;
+    height: 32px;
+    min-height: 32px;
+    padding-inline: 12px;
+    font-size: 0.8125rem;
+}
+
+/* ---- FAB 式播放键：56px 容器（fab.js 容器规范） ---- */
+:root[data-theme="md3"] .player-play {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+    border-radius: 9999px;
+}
+
+:root[data-theme="md3"] .player-play svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* 移动端播放键降为 48px */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .player-play {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+    }
+    :root[data-theme="md3"] .player-play svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+/* ---- 文本字段：material-esm text field 规范（filled 56px 高） ---- */
+:root[data-theme="md3"] .ena-input,
+:root[data-theme="md3"] .ena-select {
+    min-height: 56px;
+    border-radius: 4px 4px 0 0;
+}
+
+:root[data-theme="md3"] .ena-input--sm,
+:root[data-theme="md3"] .ena-select--sm {
+    height: 40px;
+    min-height: 40px;
+}
+
+/* ---- 触控涟漪实例在按压态可见 ---- */
+:root[data-theme="md3"] .ena-btn:active,
+:root[data-theme="md3"] .song-menu-item:active,
+:root[data-theme="md3"] .side-nav a:active {
+    overflow: hidden;
+}
+
+/* ---- reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .player-progress .player-progress-bar::after {
+        animation: none;
+        opacity: 0;
+    }
+}

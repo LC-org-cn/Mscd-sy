@@ -38,6 +38,7 @@
       "author": "MSCD 内置",
       "version": "1.0.0",
       "css": "md3/theme.css",
+      "js": "md3/theme.js",
       "modes": [
         "light",
         "dark"
