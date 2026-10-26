@@ -1220,3 +1220,265 @@
         animation: none;
     }
 }
+
+
+/* ==================== v4：状态变化动效大礼包 ==================== */
+
+/* ---- 弹性曲线（backOut 过冲，近似 MD3 expressive spring） ---- */
+:root[data-theme="md3"] {
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes md3-pop {
+    0% { transform: scale(.6); opacity: 0; }
+    60% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes md3-icon-in {
+    0% { transform: scale(.5) rotate(-90deg); opacity: 0; }
+    70% { transform: scale(1.1) rotate(4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ---- 1) 全局表面颜色过渡：主题 / 明暗 / 自选取色切换时全应用丝滑渐变 ---- */
+:root[data-theme="md3"] body,
+:root[data-theme="md3"] .top-bar,
+:root[data-theme="md3"] .sidebar,
+:root[data-theme="md3"] .player-bar,
+:root[data-theme="md3"] .content-area,
+:root[data-theme="md3"] .ena-modal__panel,
+:root[data-theme="md3"] .ena-dropdown__menu,
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .volume-popup,
+:root[data-theme="md3"] .app-tooltip,
+:root[data-theme="md3"] .ena-toast__body,
+:root[data-theme="md3"] .search-wrap,
+:root[data-theme="md3"] .ena-input,
+:root[data-theme="md3"] .ena-select,
+:root[data-theme="md3"] .ena-dropdown__trigger,
+:root[data-theme="md3"] .theme-card {
+    transition:
+        background-color .45s var(--ease-standard),
+        color .45s var(--ease-standard),
+        border-color .45s var(--ease-standard),
+        box-shadow .3s var(--ease-standard);
+}
+
+/* 控件交互态保持快速响应（hover 色快、主题切换背景慢） */
+:root[data-theme="md3"] .ena-btn {
+    transition:
+        background-color .45s var(--ease-standard),
+        color .15s var(--ease-standard),
+        transform .12s var(--ease-standard),
+        box-shadow .3s var(--ease-standard);
+}
+
+/* ---- 2) 顶栏搜索：药丸容器（补回 v1 丢失）+ focus 浮起 ---- */
+:root[data-theme="md3"] .search-wrap {
+    background: var(--bg-input);
+    border-radius: 999px;
+    overflow: visible;
+    transition: background-color .45s var(--ease-standard), box-shadow .25s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .search-wrap:focus-within {
+    box-shadow: var(--md3-shadow-2);
+}
+
+:root[data-theme="md3"] .search-wrap .ena-dropdown,
+:root[data-theme="md3"] .search-wrap .ena-dropdown__trigger,
+:root[data-theme="md3"] .search-wrap .ena-input-wrap,
+:root[data-theme="md3"] .search-wrap .ena-input,
+:root[data-theme="md3"] .search-wrap .ena-select {
+    border-radius: 0;
+    border-bottom: none;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+:root[data-theme="md3"] .search-wrap .ena-input:focus {
+    border-bottom-color: transparent;
+    background-color: transparent;
+}
+
+:root[data-theme="md3"] .search-wrap > .ena-btn {
+    border-radius: 0;
+    border-bottom: none;
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+:root[data-theme="md3"] .search-wrap > .ena-btn::before {
+    border-radius: 0;
+}
+
+:root[data-theme="md3"] .search-wrap > .ena-btn:hover {
+    color: var(--md3-primary);
+}
+
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .search-wrap > .ena-btn {
+        border-radius: 999px;
+    }
+}
+
+/* ---- 3) 播放/暂停与播放模式图标切换：入场旋转缩放（innerHTML 替换子元素自动重放） ---- */
+:root[data-theme="md3"] .player-play svg > *,
+:root[data-theme="md3"] .player-bar .ena-btn--icon svg > * {
+    animation: md3-icon-in .32s var(--ease-spring) both;
+}
+
+/* ---- 4) 勾选 / 单选 / 主题卡激活：spring pop ---- */
+:root[data-theme="md3"] .ena-checkbox input:checked + .box {
+    animation: md3-pop .3s var(--ease-spring);
+}
+
+:root[data-theme="md3"] .ena-checkbox input:checked + .box::after {
+    animation: md3-pop .32s var(--ease-spring) .06s both;
+}
+
+:root[data-theme="md3"] .ena-radio input:checked + .dot {
+    animation: md3-pop .3s var(--ease-spring);
+}
+
+:root[data-theme="md3"] .theme-card.is-active {
+    animation: md3-pop .34s var(--ease-spring);
+}
+
+/* ---- 5) 歌词当前行切换：轻 pop（class 增删触发，不随滚动重放） ---- */
+:root[data-theme="md3"] .playback-lyric__line.is-current {
+    animation: md3-pop .34s var(--ease-spring);
+}
+
+:root[data-theme="md3"] .player-lyric__line.is-current {
+    animation: md3-pop .26s var(--ease-spring);
+}
+
+/* ---- 6) 菜单出场：scale 编排 + spring ---- */
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .ena-dropdown__menu,
+:root[data-theme="md3"] .volume-popup,
+:root[data-theme="md3"] .account-menu {
+    transform: scale(.92);
+    transform-origin: top left;
+    opacity: 0;
+}
+
+:root[data-theme="md3"] .song-menu.is-open .song-menu-panel,
+:root[data-theme="md3"] .ena-dropdown__menu.is-open,
+:root[data-theme="md3"] .volume-popup.is-open {
+    transform: scale(1);
+    opacity: 1;
+    transition:
+        clip-path .25s var(--ease-standard),
+        transform .25s var(--ease-spring),
+        opacity .18s linear,
+        visibility 0s linear 0s;
+}
+
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .ena-dropdown__menu,
+:root[data-theme="md3"] .volume-popup {
+    transition:
+        clip-path .2s var(--ease-standard),
+        transform .2s var(--ease-standard),
+        opacity .14s linear,
+        visibility 0s linear .2s;
+}
+
+/* ---- 7) 封面 hover：轻放大 ---- */
+:root[data-theme="md3"] .song-cover {
+    overflow: hidden;
+}
+
+:root[data-theme="md3"] .song-cover img {
+    transition: transform .25s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .song-row:hover .song-cover img {
+    transform: scale(1.08);
+}
+
+/* ---- 8) 侧栏 / 视图切换图标：hover 微动 ---- */
+:root[data-theme="md3"] .side-nav a svg,
+:root[data-theme="md3"] .view-switcher-item svg,
+:root[data-theme="md3"] .song-menu-trigger svg {
+    transition: transform .18s var(--ease-spring);
+}
+
+:root[data-theme="md3"] .side-nav a:hover svg {
+    transform: scale(1.1);
+}
+
+:root[data-theme="md3"] .view-switcher-item:hover svg {
+    transform: scale(1.08);
+}
+
+/* ---- 9) 播放条：hover 阴影浮起 ---- */
+:root[data-theme="md3"] .player-bar {
+    transition: clip-path .35s var(--ease-emphasized), box-shadow .3s var(--ease-standard), background-color .45s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .player-bar:hover {
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="md3"][data-mode="dark"] .player-bar:hover {
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.28);
+}
+
+/* ---- 10) 歌词行 hover：微放大 ---- */
+:root[data-theme="md3"] .playback-lyric__line:hover {
+    transform: scale(1.02);
+}
+
+/* ---- 11) 主题卡 hover：浮起 ---- */
+:root[data-theme="md3"] .theme-card {
+    transition: background-color .45s var(--ease-standard), transform .2s var(--ease-spring), box-shadow .2s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .theme-card:hover {
+    transform: translateY(-1px);
+}
+
+/* ---- 12) 页签指示条 / 滑杆：spring 生长 ---- */
+:root[data-theme="md3"] .search-tab.is-active::before {
+    transition: width var(--md3-dur-medium, 300ms) var(--ease-spring);
+}
+
+:root[data-theme="md3"] .ena-range::-webkit-slider-thumb {
+    transition: transform .18s var(--ease-spring), background-color .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-range::-moz-range-thumb {
+    transition: transform .18s var(--ease-spring);
+}
+
+/* ---- 13) 输入聚焦：光标底线 spring 生长 ---- */
+:root[data-theme="md3"] .ena-input:focus,
+:root[data-theme="md3"] .ena-select:focus {
+    box-shadow: 0 1px 0 0 var(--md3-primary);
+}
+
+/* ---- 14) reduced-motion 统一退场 ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .player-play svg > *,
+    :root[data-theme="md3"] .player-bar .ena-btn--icon svg > *,
+    :root[data-theme="md3"] .ena-checkbox input:checked + .box,
+    :root[data-theme="md3"] .ena-checkbox input:checked + .box::after,
+    :root[data-theme="md3"] .ena-radio input:checked + .dot,
+    :root[data-theme="md3"] .theme-card.is-active,
+    :root[data-theme="md3"] .playback-lyric__line.is-current,
+    :root[data-theme="md3"] .player-lyric__line.is-current {
+        animation: none;
+    }
+
+    :root[data-theme="md3"] .song-menu-panel,
+    :root[data-theme="md3"] .ena-dropdown__menu,
+    :root[data-theme="md3"] .volume-popup,
+    :root[data-theme="md3"] .account-menu {
+        transform: none;
+        opacity: 1;
+    }
+}
