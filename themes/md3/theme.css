@@ -1030,3 +1030,193 @@
         color: var(--md3-on-primary-container);
     }
 }
+
+
+/* ==================== v3：MD3 动效层 ==================== */
+
+/* ---- Ripple：按钮/图标钮/主题卡（中心扩散，替代旧下划线填充残余动画） ---- */
+@keyframes md3-ripple {
+    from { transform: scale(0); opacity: var(--md3-ripple-opacity, .14); }
+    to { transform: scale(var(--md3-ripple-scale, 2.6)); opacity: 0; }
+}
+
+:root[data-theme="md3"] .ena-btn::after,
+:root[data-theme="md3"] .theme-card::after,
+:root[data-theme="md3"] .song-menu-item::after,
+:root[data-theme="md3"] .account-menu__item::after,
+:root[data-theme="md3"] .ena-dropdown__item::after,
+:root[data-theme="md3"] .side-nav a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 交互瞬间触发涟漪（hover 进入 = 指针接触的近似） */
+:root[data-theme="md3"] .ena-btn:hover::after,
+:root[data-theme="md3"] .theme-card:hover::after,
+:root[data-theme="md3"] .song-menu-item:hover::after,
+:root[data-theme="md3"] .account-menu__item:hover::after,
+:root[data-theme="md3"] .ena-dropdown__item:hover::after,
+:root[data-theme="md3"] .side-nav a:hover::after {
+    animation: md3-ripple .45s var(--ease-standard);
+    animation-fill-mode: forwards;
+}
+
+/* ---- 页面切换：视图容器入退场（app.js 每次 innerHTML='' 重建，animation 自动重放） ---- */
+@keyframes md3-view-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes md3-view-in-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+:root[data-theme="md3"] .search-view,
+:root[data-theme="md3"] .queue-view,
+:root[data-theme="md3"] .downloads-view,
+:root[data-theme="md3"] .status-view,
+:root[data-theme="md3"] .settings-view,
+:root[data-theme="md3"] .myfavorites-view,
+:root[data-theme="md3"] .liked-view {
+    animation: md3-view-in var(--md3-dur-medium, 300ms) var(--ease-decelerate) both;
+}
+
+/* ---- 详情页头部：hero 封面入场（decelerate + 轻缩放） ---- */
+@keyframes md3-hero-in {
+    from { opacity: 0; transform: scale(.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+:root[data-theme="md3"] .detail-header__cover {
+    animation: md3-hero-in var(--md3-dur-medium, 300ms) var(--ease-decelerate) both;
+}
+
+:root[data-theme="md3"] .detail-header__title {
+    animation: md3-view-in-fade calc(var(--md3-dur-medium, 300ms) + 40ms) var(--ease-standard) both;
+}
+
+/* ---- 主题卡片组：级联入场（settings 每次重建，交错 40ms） ---- */
+@keyframes md3-card-in {
+    from { opacity: 0; transform: translateY(10px) scale(.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+:root[data-theme="md3"] .theme-card {
+    animation: md3-card-in var(--md3-dur-medium, 300ms) var(--ease-decelerate) both;
+    animation-delay: calc(var(--md3-card-i, 0) * 40ms);
+}
+
+:root[data-theme="md3"] .theme-card:nth-child(1) { --md3-card-i: 0; }
+:root[data-theme="md3"] .theme-card:nth-child(2) { --md3-card-i: 1; }
+:root[data-theme="md3"] .theme-card:nth-child(3) { --md3-card-i: 2; }
+:root[data-theme="md3"] .theme-card:nth-child(4) { --md3-card-i: 3; }
+:root[data-theme="md3"] .theme-card:nth-child(5) { --md3-card-i: 4; }
+:root[data-theme="md3"] .theme-card:nth-child(6) { --md3-card-i: 5; }
+
+/* ---- 搜索页签指示条：emphasized 弹性生长（宽度过渡已设，此处补弹性曲线） ---- */
+:root[data-theme="md3"] .search-tab::before {
+    transition: width var(--md3-dur-medium, 300ms) var(--ease-emphasized);
+}
+
+/* ---- 播放键：悬停放大 + 主色阴影呼吸 ---- */
+:root[data-theme="md3"] .ena-btn--icon.ena-btn--primary {
+    transition: transform .18s var(--ease-standard), box-shadow .18s var(--ease-standard), background-color .15s var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-btn--icon.ena-btn--primary:hover {
+    transform: scale(1.06);
+}
+
+:root[data-theme="md3"] .ena-btn--icon.ena-btn--primary:active {
+    transform: scale(.92);
+}
+
+/* ---- 进度条：悬停增粗（MD3 交互反馈） ---- */
+:root[data-theme="md3"] .player-progress,
+:root[data-theme="md3"] .player-progress-bar {
+    transition: background-color .2s var(--ease-standard);
+}
+
+/* ---- Toast：滑入 + decelerate ---- */
+@keyframes md3-toast-in {
+    from { opacity: 0; transform: translateX(24px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+:root[data-theme="md3"] .ena-toast.is-in .ena-toast__body {
+    animation: md3-toast-in var(--md3-dur-medium, 300ms) var(--ease-decelerate) both;
+}
+
+/* ---- 模态：入场编排（scale + fade，emphasized decelerate） ---- */
+:root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel {
+    animation: md3-modal-in .28s var(--ease-decelerate) both;
+}
+
+@keyframes md3-modal-in {
+    from { transform: scale(.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ---- 播放状态柱：MD3 弹性节律 ---- */
+@keyframes md3-bars-wave {
+    0%, 100% { transform: scaleY(.35); }
+    50% { transform: scaleY(1); }
+}
+
+:root[data-theme="md3"] .song-playing-bars span {
+    background: var(--md3-primary);
+    animation: md3-bars-wave 1.05s var(--ease-standard) infinite;
+}
+
+:root[data-theme="md3"] .song-playing-bars span:nth-child(2) { animation-delay: .12s; }
+:root[data-theme="md3"] .song-playing-bars span:nth-child(3) { animation-delay: .24s; }
+:root[data-theme="md3"] .song-playing-bars span:nth-child(4) { animation-delay: .36s; }
+
+/* ---- 滚动条出现动效 ---- */
+:root[data-theme="md3"] ::-webkit-scrollbar-thumb {
+    transition: background-color .2s var(--ease-standard);
+}
+
+/* ---- 播放页封面：入场强调 ---- */
+@keyframes md3-cover-in {
+    from { opacity: 0; transform: scale(.92) rotate(-1.5deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+:root[data-theme="md3"] .playback-cover {
+    animation: md3-cover-in var(--md3-dur-long, 500ms) var(--ease-emphasized) both;
+}
+
+/* ---- 用户偏好：减少动效时全部退场 ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .search-view,
+    :root[data-theme="md3"] .queue-view,
+    :root[data-theme="md3"] .downloads-view,
+    :root[data-theme="md3"] .status-view,
+    :root[data-theme="md3"] .settings-view,
+    :root[data-theme="md3"] .myfavorites-view,
+    :root[data-theme="md3"] .liked-view,
+    :root[data-theme="md3"] .theme-card,
+    :root[data-theme="md3"] .detail-header__cover,
+    :root[data-theme="md3"] .detail-header__title,
+    :root[data-theme="md3"] .ena-modal.is-open .ena-modal__panel,
+    :root[data-theme="md3"] .ena-toast.is-in .ena-toast__body,
+    :root[data-theme="md3"] .playback-cover,
+    :root[data-theme="md3"] .song-playing-bars span {
+        animation: none;
+    }
+    :root[data-theme="md3"] .ena-btn:hover::after,
+    :root[data-theme="md3"] .theme-card:hover::after,
+    :root[data-theme="md3"] .song-menu-item:hover::after,
+    :root[data-theme="md3"] .account-menu__item:hover::after,
+    :root[data-theme="md3"] .ena-dropdown__item:hover::after,
+    :root[data-theme="md3"] .side-nav a:hover::after {
+        animation: none;
+    }
+}
