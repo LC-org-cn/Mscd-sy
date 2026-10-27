@@ -1903,3 +1903,100 @@
         transition: none;
     }
 }
+
+
+/* ==================== v13：搜索框图标让位与 search-mode 选中一体化 ==================== */
+
+/* ---- 图标让位：.ena-input--icon 保留基础图标内边距（v11b 的 0 16px 覆盖了它导致图标压字） ---- */
+:root[data-theme="md3"] .ena-input--icon {
+    padding-left: 34px;
+}
+
+:root[data-theme="md3"] .ena-input--icon + .ena-input-icon,
+:root[data-theme="md3"] .ena-input-wrap .ena-input-icon {
+    left: 12px;
+    width: 16px;
+    height: 16px;
+    color: var(--md3-on-surface-variant);
+}
+
+/* 搜索上下文继承（search-wrap 的 30px 基础被 v11b 覆盖后图标让位 34px） */
+:root[data-theme="md3"] .search-wrap .ena-input--icon {
+    padding-left: 34px;
+}
+
+/* 窄窗口（桌面缩窗，icon 仍显示）时图标让位维持 */
+:root[data-theme="md3"] .search-wrap .ena-input-icon {
+    left: 12px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ---- search-mode「综合」tab：选中下划线覆盖整行（含下拉箭头） ---- */
+:root[data-theme="md3"] .search-mode {
+    gap: 0;
+}
+
+:root[data-theme="md3"] .search-tab {
+    position: relative;
+    padding: 8px 10px;
+    color: var(--md3-on-surface-variant);
+    transition: color 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .search-tab.is-active {
+    color: var(--md3-primary);
+    border-bottom-color: var(--md3-primary);
+}
+
+/* ---- 搜索按钮（移动端变图标钮）：icon-button 规范 ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .search-wrap > .ena-btn {
+        background: var(--md3-primary);
+        color: var(--md3-on-primary);
+        border-bottom: none;
+        border-radius: 9999px;
+    }
+
+    :root[data-theme="md3"] .search-wrap > .ena-btn::before {
+        display: none;
+    }
+}
+
+/* ---- select 下拉箭头：换 MD3 标准三角（SVG data-uri，随模式变色） ---- */
+
+
+/* ==================== v14：select 箭头 MD3 化 + 撤 focus 下划线残留 ==================== */
+
+/* ---- 箭头：on-surface-variant 色、14px、贴右；focus 时 primary 色 ---- */
+:root[data-theme="md3"] .ena-select {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cac4d0' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+}
+
+/* 浅色模式箭头 */
+:root[data-theme="md3"][data-mode="light"] .ena-select {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23444c59' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* focus：primary 色箭头（无下划线渐变） */
+:root[data-theme="md3"] .ena-select:focus {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d0bcff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-size: 14px;
+    color: var(--md3-on-surface);
+    box-shadow: inset 0 -3px 0 -1px var(--md3-primary);
+}
+
+:root[data-theme="md3"][data-mode="light"] .ena-select:focus {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236750a4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+/* ---- 下划线渐变已由上方单层 background-image 覆盖撤除（不动全局 --fill token） ---- */
+
+/* search-wrap 里 select 高度与药丸同步（v9 的 36px 仍有效，此处补 focus 无下划线） */
+:root[data-theme="md3"] .search-wrap .ena-select:focus {
+    box-shadow: none;
+    background: var(--md3-surface-container-highest);
+}
