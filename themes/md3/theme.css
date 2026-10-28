@@ -2135,3 +2135,131 @@
         transition: none;
     }
 }
+
+
+/* ==================== v16：动画全面接管（MD3 motion 替换残留旧曲线） ==================== */
+/* v1 已重定义 --ease-standard/--ease-emphasized（91 处 var 引用自动 MD3 化）；
+   此层清除写死的 ease / linear / .22-.42s 旧模式，统一 MD3 时长与曲线：
+   150ms 状态色变 · 250ms 变换 · 300ms 弹层 · 500ms 尺寸 */
+
+/* ---- 1) 状态色变：150ms MD3 standard（原 color .2/.25/.3s ease） ---- */
+:root[data-theme="md3"] .ena-btn,
+:root[data-theme="md3"] .ena-btn--sm,
+:root[data-theme="md3"] .ena-btn--icon,
+:root[data-theme="md3"] .search-tab,
+:root[data-theme="md3"] .ena-radio,
+:root[data-theme="md3"] .ena-checkbox,
+:root[data-theme="md3"] .ena-select,
+:root[data-theme="md3"] .ena-input,
+:root[data-theme="md3"] .song-menu-item,
+:root[data-theme="md3"] .player-more-item,
+:root[data-theme="md3"] .mobile-more-item,
+:root[data-theme="md3"] .multi-select-menu-item,
+:root[data-theme="md3"] .view-switcher-item,
+:root[data-theme="md3"] .side-tree-node,
+:root[data-theme="md3"] .ena-dropdown__item,
+:root[data-theme="md3"] .account-menu__item,
+:root[data-theme="md3"] .pagination-page {
+    transition: color 150ms var(--ease-standard),
+        background-color 150ms var(--ease-standard),
+        border-color 150ms var(--ease-standard),
+        opacity 150ms var(--ease-standard);
+}
+
+/* ---- 2) 变换类：250ms（原 transform .22/.25/.28s） ---- */
+:root[data-theme="md3"] .song-cover-overlay,
+:root[data-theme="md3"] .side-tree-node__toggle,
+:root[data-theme="md3"] .ena-dropdown__trigger,
+:root[data-theme="md3"] .theme-card,
+:root[data-theme="md3"] .ena-btn--icon svg,
+:root[data-theme="md3"] .player-play svg {
+    transition: transform 250ms var(--ease-standard),
+        opacity 150ms var(--ease-standard);
+}
+
+/* ---- 3) 弹层出入：300ms emphasized（原 clip-path .25/.32/.35/.42s） ---- */
+:root[data-theme="md3"] .song-menu-panel,
+:root[data-theme="md3"] .player-more-menu,
+:root[data-theme="md3"] .mobile-more-menu,
+:root[data-theme="md3"] .mv-quality-menu,
+:root[data-theme="md3"] .multi-select-menu,
+:root[data-theme="md3"] .view-switcher-menu,
+:root[data-theme="md3"] .ena-dropdown__menu,
+:root[data-theme="md3"] .volume-popup {
+    transition: clip-path 300ms var(--ease-standard),
+        visibility 0s linear 300ms,
+        opacity 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .song-menu.is-open .song-menu-panel,
+:root[data-theme="md3"] .player-more-menu.is-open,
+:root[data-theme="md3"] .mobile-more-menu.is-open,
+:root[data-theme="md3"] .mv-quality-menu.is-open,
+:root[data-theme="md3"] .multi-select-menu.is-open,
+:root[data-theme="md3"] .view-switcher-menu.is-open,
+:root[data-theme="md3"] .ena-dropdown__menu.is-open,
+:root[data-theme="md3"] .volume-popup.is-open,
+:root[data-theme="md3"] .account-menu.is-open {
+    transition: clip-path 300ms var(--ease-standard),
+        visibility 0s linear 0s;
+}
+
+/* ---- 4) 进度/尺寸：500ms emphasized（原 width .1s linear） ---- */
+:root[data-theme="md3"] .player-progress-bar,
+:root[data-theme="md3"] .ena-progress__bar,
+:root[data-theme="md3"] .task-track__progress {
+    transition: width 500ms var(--ease-emphasized);
+}
+
+/* ---- 5) 高度过渡：250ms（原 height .22s linear） ---- */
+:root[data-theme="md3"] .side-tree,
+:root[data-theme="md3"] .side-tree-inner {
+    transition: height 250ms var(--ease-standard);
+}
+
+/* ---- 6) 列表行状态：MD3 list item 规范 ---- */
+:root[data-theme="md3"] .song-row {
+    transition: background-color 150ms var(--ease-standard),
+        color 150ms var(--ease-standard);
+}
+
+/* ---- 7) 封面占位（截图灰色胶囊）：MD3 化 ---- */
+:root[data-theme="md3"] .song-cover {
+    border-radius: 8px;
+    background: var(--md3-surface-container-high);
+    color: var(--md3-on-surface-variant);
+    transition: background-color 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .song-cover-overlay {
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--md3-surface-container-highest) 72%, transparent);
+    color: var(--md3-on-surface);
+}
+
+/* 封面图片淡入（MD3 image loading） */
+:root[data-theme="md3"] .song-cover img {
+    animation: md3-img-in 250ms var(--ease-decelerate) both;
+}
+
+@keyframes md3-img-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ---- 8) 加载音条（loading-bars）：MD3 indicator 曲线 ---- */
+:root[data-theme="md3"] .loading-bars span,
+:root[data-theme="md3"] .side-tree-loading span {
+    animation: loading-bars 1000ms var(--ease-standard) infinite;
+    border-radius: 9999px;
+    background: var(--md3-primary);
+}
+
+/* ---- 9) reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .song-cover img,
+    :root[data-theme="md3"] .loading-bars span,
+    :root[data-theme="md3"] .side-tree-loading span {
+        animation: none;
+    }
+}
