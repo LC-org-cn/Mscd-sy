@@ -2263,3 +2263,106 @@
         animation: none;
     }
 }
+
+
+/* ==================== v17：switch/radio 伪元素残留清除（thumb 丢失根因） ==================== */
+
+/* ---- switch handle：清掉基础 checkmark 残留 ---- */
+/* 基础 .box::after 是 checkmark：border-left/bottom + rotate(-45deg) + clip-path:inset(100% 0 0 0)。
+   v7 只加了 width/height/border-radius/background，旧 clip-path 把整个 handle 裁没了 → 空胶囊无 thumb。 */
+:root[data-theme="md3"] .ena-checkbox .box::after {
+    clip-path: none;
+    border: none;
+    border-radius: 9999px;
+    transform: translateY(-50%);
+    margin-top: 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .3);
+}
+
+/* ---- radio：MD3 完整组件（清渐变底与旧裁剪） ---- */
+:root[data-theme="md3"] .ena-radio .dot {
+    background-image: none;
+    background-color: transparent;
+    border: 2px solid var(--md3-on-surface-variant);
+    transition: border-color 150ms var(--ease-standard), background-color 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .ena-radio .dot::after {
+    clip-path: none;
+    border-radius: 9999px;
+    background: transparent;
+    transition: background-color 150ms var(--ease-standard), transform 150ms var(--ease-standard);
+    transform: scale(.5);
+}
+
+:root[data-theme="md3"] .ena-radio input:checked + .dot {
+    background-color: var(--md3-primary);
+    border-color: var(--md3-primary);
+    background-image: none;
+}
+
+/* material-esm radio：选中 = primary 环 + primary 心（inner circle 300ms decelerate 生长） */
+:root[data-theme="md3"] .ena-radio input:checked + .dot::after {
+    background: var(--md3-primary);
+    clip-path: none;
+    transform: scale(1);
+    animation: md3-radio-inner-grow 300ms var(--ease-decelerate);
+}
+
+@keyframes md3-radio-inner-grow {
+    from { transform: scale(.3); }
+    to { transform: scale(1); }
+}
+
+/* hover 状态层（dot 环不位移） */
+:root[data-theme="md3"] .ena-radio:hover .dot {
+    border-color: var(--md3-on-surface);
+    background-image: none;
+}
+
+/* ---- checkbox 非 switch 场景（列表勾选框仍是方框语义的地方）不受影响：v7 已全量 switch 化 ---- */
+
+/* ---- switch disabled 态 ---- */
+:root[data-theme="md3"] .ena-checkbox.is-disabled .box,
+:root[data-theme="md3"] .ena-checkbox:has(input:disabled) .box {
+    background: color-mix(in srgb, var(--md3-surface-container-highest) 50%, transparent);
+    border-color: color-mix(in srgb, var(--md3-on-surface) 20%, transparent);
+}
+
+:root[data-theme="md3"] .ena-checkbox:has(input:disabled) .box::after {
+    background: color-mix(in srgb, var(--md3-on-surface) 30%, transparent);
+    box-shadow: none;
+}
+
+/* ---- reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .ena-checkbox .box::after,
+    :root[data-theme="md3"] .ena-radio .dot,
+    :root[data-theme="md3"] .ena-radio .dot::after {
+        transition: none;
+        animation: none;
+    }
+}
+
+
+/* ==================== v18：setting-format-input 下划线残留清除 ==================== */
+:root[data-theme="md3"] .setting-format-input {
+    border-bottom: none;
+    background: var(--md3-surface-container-high);
+    border-radius: 4px 4px 0 0;
+    padding: 0 16px;
+    height: 56px;
+    min-height: 56px;
+    color: var(--md3-on-surface);
+    transition: background-color 150ms var(--ease-standard), box-shadow 150ms var(--ease-standard);
+}
+
+:root[data-theme="md3"] .setting-format-input:focus {
+    background: var(--md3-surface-container-highest);
+    box-shadow: inset 0 -3px 0 -1px var(--md3-primary);
+    outline: none;
+}
+
+:root[data-theme="md3"] .setting-format-input::placeholder {
+    color: var(--md3-on-surface-variant);
+}
