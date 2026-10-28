@@ -2000,3 +2000,138 @@
     box-shadow: none;
     background: var(--md3-surface-container-highest);
 }
+
+
+/* ==================== v15：移动端一揽子修复（真实结构适配） ==================== */
+
+/* ---- 1) 工具栏（下载/队列页）：chip 化窄排，防溢出 ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .view-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
+    :root[data-theme="md3"] .view-toolbar .ena-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        min-height: 32px;
+        height: 32px;
+        flex: 0 1 auto;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    :root[data-theme="md3"] .view-toolbar .ena-btn--sm {
+        padding: 5px 10px;
+        min-height: 32px;
+        height: 32px;
+    }
+
+    /* 主操作（全部下载）不再独占挤压 */
+    :root[data-theme="md3"] .view-toolbar .ena-btn--primary {
+        flex: 1 1 auto;
+    }
+}
+
+/* ---- 2) 顶栏搜索区（平板中间态）：select 紧凑 + 按钮固定 ---- */
+@media (max-width: 1200px) and (min-width: 901px) {
+    :root[data-theme="md3"] .search-wrap .ena-select {
+        width: 72px;
+        min-width: 72px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ---- 3) 弹窗 footer：移动端双列等宽（MD3 dialog 移动布局） ---- */
+@media (max-width: 600px) {
+    :root[data-theme="md3"] .ena-modal__footer {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 12px 16px 16px;
+    }
+
+    :root[data-theme="md3"] .ena-modal__footer .ena-btn {
+        width: 100%;
+        min-height: 44px;
+        height: 44px;
+        justify-content: center;
+        margin: 0;
+    }
+
+    /* 关闭按钮：内移避让手势区 */
+    :root[data-theme="md3"] .ena-modal__close {
+        margin-right: 4px;
+    }
+}
+
+/* ---- 4) radio 组：dot 放大 + 窄屏换行 ---- */
+:root[data-theme="md3"] .ena-radio .dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 9999px;
+    border-width: 2px;
+}
+
+:root[data-theme="md3"] .ena-radio {
+    gap: 10px;
+    min-height: 44px;
+    padding: 4px 8px;
+}
+
+:root[data-theme="md3"] .ena-radio-group {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ---- 5) 滑杆上下留白（设置页）：贴行高 ---- */
+:root[data-theme="md3"] .setting-group .ena-range {
+    margin: 8px 0 4px;
+}
+
+/* ---- 6) 主题卡：移动端紧凑双列 ---- */
+@media (max-width: 600px) {
+    :root[data-theme="md3"] .theme-card {
+        min-height: 0;
+        padding: 12px;
+    }
+}
+
+/* ---- 7) 底部导航标签：防截断（基础 ellipsis 保留）+ 触控高度 ---- */
+@media (max-width: 900px) {
+    :root[data-theme="md3"] .side-nav a {
+        padding: 6px 2px 4px;
+        gap: 3px;
+        min-width: 64px;
+    }
+
+    :root[data-theme="md3"] .side-nav a span {
+        font-size: 0.6563rem;
+        line-height: 1.2;
+        max-width: 100%;
+    }
+
+    /* 药丸指示器贴图标层（32px 高在 46px nav 内） */
+    :root[data-theme="md3"] .side-nav a.is-active::before {
+        height: 30px;
+        top: 8px;
+        transform: translateX(-50%);
+    }
+}
+
+/* ---- 8) 触屏工具栏按钮：44px 触控（放宽 sm 芯片以内容区为准） ---- */
+@media (pointer: coarse) {
+    :root[data-theme="md3"] .view-toolbar .ena-btn {
+        min-height: 36px;
+        height: 36px;
+    }
+}
+
+/* ---- reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+    :root[data-theme="md3"] .ena-radio,
+    :root[data-theme="md3"] .theme-card {
+        transition: none;
+    }
+}
